@@ -1,0 +1,115 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}About Us | Stackmart{% endblock %}
+
+{% block content %}
+
+<div class="relative py-20">
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-brand-purple/10 rounded-full blur-3xl -z-10 animate-pulse-slow"></div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10 relative">
+        <h1 class="text-4xl md:text-6xl font-extrabold text-gray-900 dark:text-white mb-6 tracking-tight animate-fade-in-up">
+            Built for <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-pink to-brand-purple">Builders</span>.
+        </h1>
+        <p class="mt-4 max-w-2xl mx-auto text-xl text-gray-600 dark:text-gray-400 font-mono animate-fade-in-up" style="animation-delay: 150ms;">
+            The open-source alternative to big tech marketplaces. 
+            No scalpers. No bots. Just hardware.
+        </p>
+    </div>
+</div>
+
+<div class="max-w-5xl mx-auto mb-24 px-4">
+    <div class="bg-[#1e1e1e] rounded-xl shadow-2xl border border-gray-800 overflow-hidden">
+        <div class="bg-[#2d2d2d] px-4 py-2 flex items-center gap-2 border-b border-gray-700">
+            <div class="flex gap-2">
+                <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                <div class="w-3 h-3 rounded-full bg-green-500"></div>
+            </div>
+            <div class="ml-4 text-xs text-gray-400 font-mono">origin_story.md — vim</div>
+        </div>
+        
+        <div class="p-6 md:p-10 font-mono text-sm md:text-base text-gray-300 leading-relaxed">
+            <p class="mb-6">
+                <span class="text-brand-pink"># The Problem</span><br>
+                Trying to sell a used server rack on normal marketplaces is a nightmare. 
+                "Is this a wine cabinet?" No, it's a 42U Dell rack.
+            </p>
+            <p class="mb-6">
+                <span class="text-brand-pink"># The Solution</span><br>
+                Stackmart was born in a dorm room in 2024. We wanted a place where specs matter. 
+                Where you don't have to explain what "ECC RAM" is. 
+                Where the community verifies the gear.
+            </p>
+            <p>
+                <span class="text-brand-pink"># Our Mission</span><br>
+                To circulate high-performance hardware back into the hands of learners, hackers, and builders.
+                <span class="animate-pulse text-brand-cyan">_</span>
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-24">
+    <div class="text-center mb-12">
+        <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">Under the Hood</h2>
+        <p class="text-gray-500 font-mono">We practice what we preach. Stackmart is built on:</p>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div class="p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm hover:border-brand-cyan/50 transition-colors text-center group">
+            <i class="fa-brands fa-python text-4xl text-gray-400 group-hover:text-blue-500 mb-4 transition-colors"></i>
+            <h3 class="font-bold text-gray-900 dark:text-white mt-4">Django</h3>
+            <p class="text-xs text-gray-500 font-mono mt-2">The Framework</p>
+        </div>
+        <div class="p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm hover:border-brand-cyan/50 transition-colors text-center group">
+            <i class="fa-solid fa-wind text-4xl text-gray-400 group-hover:text-cyan-400 mb-4 transition-colors"></i>
+            <h3 class="font-bold text-gray-900 dark:text-white mt-4">Tailwind CSS</h3>
+            <p class="text-xs text-gray-500 font-mono mt-2">The Style</p>
+        </div>
+        <div class="p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm hover:border-brand-cyan/50 transition-colors text-center group">
+            <i class="fa-brands fa-docker text-4xl text-gray-400 group-hover:text-blue-600 mb-4 transition-colors"></i>
+            <h3 class="font-bold text-gray-900 dark:text-white mt-4">Docker</h3>
+            <p class="text-xs text-gray-500 font-mono mt-2">The Container</p>
+        </div>
+        <div class="p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm hover:border-brand-cyan/50 transition-colors text-center group">
+            <i class="fa-solid fa-database text-4xl text-gray-400 group-hover:text-yellow-500 mb-4 transition-colors"></i>
+            <h3 class="font-bold text-gray-900 dark:text-white mt-4">PostgreSQL</h3>
+            <p class="text-xs text-gray-500 font-mono mt-2">The Memory</p>
+        </div>
+    </div>
+</div>
+
+<div class="border-y border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-black/20 backdrop-blur-sm mb-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+            <div>
+                <div class="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-brand-pink to-brand-purple">12k+</div>
+                <div class="mt-2 text-sm text-gray-500 font-mono uppercase tracking-widest">Active Members</div>
+            </div>
+            <div>
+                <div class="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-brand-purple to-brand-cyan">$4.2M</div>
+                <div class="mt-2 text-sm text-gray-500 font-mono uppercase tracking-widest">Hardware Saved</div>
+            </div>
+            <div>
+                <div class="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-brand-cyan to-brand-pink">0%</div>
+                <div class="mt-2 text-sm text-gray-500 font-mono uppercase tracking-widest">Platform Fees</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="text-center max-w-3xl mx-auto px-4 mb-24">
+    <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-6">Ready to upgrade?</h2>
+    <div class="flex flex-col sm:flex-row justify-center gap-4">
+        <a href="#" class="px-8 py-3 rounded-lg bg-brand-purple hover:bg-purple-700 text-white font-bold font-mono transition-colors shadow-lg shadow-brand-purple/30">
+            Join_Community
+        </a>
+        <a href="#" class="px-8 py-3 rounded-lg border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-900 dark:text-white font-bold font-mono transition-colors">
+            <i class="fa-brands fa-github mr-2"></i> Star on GitHub
+        </a>
+    </div>
+</div>
+
+{% endblock %}

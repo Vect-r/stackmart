@@ -1,0 +1,517 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Stackmart | IT Marketplace{% endblock %}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;600&family=Inter:wght@300;400;600;800&display=swap"
+        rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+
+
+    <!-- <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['"Fira Code"', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            pink: '#ff0080',
+                            purple: '#7928ca',
+                            cyan: '#00dfd8',
+                        }
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script> -->
+
+    <!-- <script>
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.theme = 'light';
+            } else {
+                html.classList.add('dark');
+                localStorage.theme = 'dark';
+            }
+        }
+    </script> -->
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['"Fira Code"', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            pink: '#ff0080',
+                            purple: '#7928ca',
+                            cyan: '#00dfd8',
+                        }
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'fade-in-up': 'fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards', // Smooth Apple-like ease
+                        'float': 'float 6s ease-in-out infinite',
+                        'wiggle': 'wiggle 1s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(30px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        wiggle: {
+                            '0%, 100%': { transform: 'rotate(-3deg)' },
+                            '50%': { transform: 'rotate(3deg)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* ... your existing scrollbar styles ... */
+
+        /* Scroll Reveal Base State */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Scroll Reveal Active State */
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Staggered delays for grid items */
+        .delay-100 {
+            transition-delay: 100ms;
+        }
+
+        .delay-200 {
+            transition-delay: 200ms;
+        }
+
+        .delay-300 {
+            transition-delay: 300ms;
+        }
+    </style>
+
+    <script>
+        // 1. Check preference on load
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+
+        // 2. The Toggle Function (Clicked by User)
+        function toggleTheme() {
+            const html = document.documentElement;
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.theme = 'light';
+            } else {
+                html.classList.add('dark');
+                localStorage.theme = 'dark';
+            }
+        }
+
+        // 3. The Sync Mechanism (Listens for changes in OTHER tabs)
+        window.addEventListener('storage', (event) => {
+            // Only react if the 'theme' key was changed
+            if (event.key === 'theme') {
+                const html = document.documentElement;
+                if (event.newValue === 'dark') {
+                    html.classList.add('dark');
+                } else {
+                    html.classList.remove('dark');
+                }
+            }
+        });
+    </script>
+
+    <style>
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f4f4f5;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #d4d4d8;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a1a1aa;
+        }
+
+        .dark ::-webkit-scrollbar-track {
+            background: #18181b;
+        }
+
+        .dark ::-webkit-scrollbar-thumb {
+            background: #3f3f46;
+        }
+
+        .dark ::-webkit-scrollbar-thumb:hover {
+            background: #52525b;
+        }
+
+        /* Fireship Gradient Text */
+        .text-gradient {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-image: linear-gradient(to right, #ff0080, #7928ca);
+        }
+    </style>
+
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body
+    class="bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-200 font-sans flex flex-col min-h-screen transition-colors duration-300">
+
+    <div class="fixed inset-0 z-[-1] pointer-events-none overflow-hidden">
+        <div
+            class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-brand-purple/30 dark:bg-brand-purple/20 rounded-full blur-3xl opacity-60 dark:opacity-40 animate-pulse-slow">
+        </div>
+        <div
+            class="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-brand-cyan/30 dark:bg-brand-cyan/20 rounded-full blur-3xl opacity-60 dark:opacity-40 animate-pulse-slow">
+        </div>
+        <div
+            class="absolute top-[40%] left-[30%] w-72 h-72 bg-brand-pink/20 dark:bg-brand-pink/10 rounded-full blur-[100px] opacity-30">
+        </div>
+    </div>
+
+    <nav
+        class="sticky top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-gray-900/80 border-b border-gray-200 dark:border-gray-800 transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+
+                <div class="flex-shrink-0">
+                    <a href="/" class="flex items-center gap-2 group">
+                        <i
+                            class="fa-solid fa-terminal text-brand-cyan text-xl group-hover:rotate-12 transition-transform duration-300"></i>
+                        <span class="font-mono font-bold text-xl tracking-tighter">
+                            STACK<span class="text-gradient">MART</span>
+                        </span>
+                    </a>
+                </div>
+
+                <!-- <div class="flex-shrink-0">
+                    <a href="/" class="flex items-center gap-2 group">
+                        <svg width="180" height="40" viewBox="0 0 180 40" ... (rest of svg) ... </svg>
+                        <svg width="180" height="40" viewBox="0 0 180 40" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="mart-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color:#ff0080;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#7928ca;stop-opacity:1" />
+                                </linearGradient>
+                                <filter id="cyan-glow" x="-50%" y="-50%" width="200%" height="200%">
+                                    <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur5" />
+                                    <feMerge>
+                                        <feMergeNode in="blur5" />
+                                        <feMergeNode in="SourceGraphic" />
+                                    </feMerge>
+                                </filter>
+                            </defs>
+
+                            <g transform="translate(4, 4)">
+                                <rect x="2" y="20" width="24" height="8" rx="1" fill="#18181b" stroke="#00dfd8"
+                                    stroke-width="2" filter="url(#cyan-glow)" />
+                                <circle cx="6" cy="24" r="1.5" fill="#00dfd8" />
+                                <circle cx="10" cy="24" r="1.5" fill="#00dfd8" />
+
+                                <rect x="6" y="10" width="24" height="8" rx="1" fill="#18181b" stroke="#00dfd8"
+                                    stroke-width="2" filter="url(#cyan-glow)" />
+                                <circle cx="10" cy="14" r="1.5" fill="#00dfd8" />
+                                <circle cx="14" cy="14" r="1.5" fill="#00dfd8" />
+
+                                <rect x="2" y="0" width="24" height="8" rx="1" fill="#18181b" stroke="#00dfd8"
+                                    stroke-width="2" filter="url(#cyan-glow)" />
+                                <path d="M6 4L9 6.5L6 9" stroke="#7928ca" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                                <line x1="11" y1="9" x2="15" y2="9" stroke="#ff0080" stroke-width="2"
+                                    stroke-linecap="round" />
+
+                                <path d="M30 8H34C35.1046 8 36 8.89543 36 10V24C36 25.1046 35.1046 26 34 26H32"
+                                    stroke="#7928ca" stroke-width="2" stroke-linecap="round" />
+                                <circle cx="34" cy="28" r="2" fill="#ff0080" />
+                            </g>
+
+                            <text x="50" y="27" font-family="'Fira Code', 'Roboto Mono', monospace" font-size="22"
+                                font-weight="700" letter-spacing="-1">
+                                <tspan fill="#e4e4e7">STACK</tspan>
+                                <tspan fill="url(#mart-gradient)">MART</tspan>
+                            </text>
+                        </svg>
+                    </a>
+                </div> -->
+
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#"
+                            class="font-mono text-sm font-medium hover:text-brand-cyan transition-colors px-3 py-2 rounded-md">Browse</a>
+                        <a href="#"
+                            class="font-mono text-sm font-medium hover:text-brand-cyan transition-colors px-3 py-2 rounded-md">Selling</a>
+                        <a href="{%url 'blog'%}"
+                            class="font-mono text-sm font-medium hover:text-brand-cyan transition-colors px-3 py-2 rounded-md">Blog</a>
+                        <a href="#"
+                            class="font-mono text-sm font-medium hover:text-brand-cyan transition-colors px-3 py-2 rounded-md">Community</a>
+                        <a href="{% url 'about' %}"
+                            class="font-mono text-sm font-medium hover:text-brand-cyan transition-colors px-3 py-2 rounded-md">About
+                            Us</a>
+                    </div>
+                </div>
+
+                <div class="hidden md:flex items-center gap-4">
+                    <!-- <div class="relative w-64">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                            <i class="fa-solid fa-search"></i>
+                        </span>
+                        <input type="text"
+                            class="bg-gray-100 dark:bg-[#1f1f23] border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-300 text-sm rounded-lg focus:ring-brand-purple focus:border-brand-purple block w-full pl-10 p-2 placeholder-gray-500 font-mono transition-colors duration-300"
+                            placeholder="Search hardware...">
+                    </div> -->
+
+                    <div class="relative w-64">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                            <i class="fa-solid fa-search"></i>
+                        </span>
+                        <input type="text" id="nav-search"
+                            class="bg-gray-100 dark:bg-[#1f1f23] border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-300 text-sm rounded-lg focus:ring-brand-purple focus:border-brand-purple block w-full pl-10 p-2 font-mono transition-colors duration-300 placeholder:text-gray-500 placeholder:transition-all placeholder:duration-500"
+                            placeholder="Search hardware...">
+                    </div>
+
+
+
+                    <button onclick="toggleTheme()"
+                        class="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-brand-purple dark:hover:text-brand-cyan transition-colors border border-gray-200 dark:border-gray-700">
+                        <i class="fa-solid fa-sun block dark:hidden"></i>
+                        <i class="fa-solid fa-moon hidden dark:block"></i>
+                    </button>
+
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'login' %}"
+                        class="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 px-4 py-2 rounded-lg transition-all border border-gray-200 dark:border-gray-700">
+                        <i class="fa-solid fa-user-astronaut text-brand-purple"></i>
+                        <span class="font-mono text-sm font-bold">Login</span>
+                    </a>
+                    {% else %}
+                    <a href="{% url 'login' %}"
+                        class="relative inline-flex items-center justify-center p-0.5 overflow-hidden text-sm font-medium rounded-lg group bg-gradient-to-br from-brand-pink to-brand-purple group-hover:from-brand-pink group-hover:to-brand-purple hover:text-white text-white focus:ring-4 focus:outline-none focus:ring-purple-200 dark:focus:ring-purple-800">
+                        <span
+                            class="relative px-5 py-2 transition-all ease-in duration-75 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-md group-hover:bg-opacity-0 group-hover:text-white font-mono font-bold">
+                            Login
+                        </span>
+                    </a>
+                    {% endif %}
+                </div>
+
+                <div class="-mr-2 flex md:hidden gap-4">
+                    <button onclick="toggleTheme()" class="p-2 text-gray-500 dark:text-gray-400">
+                        <i class="fa-solid fa-sun block dark:hidden"></i>
+                        <i class="fa-solid fa-moon hidden dark:block"></i>
+                    </button>
+                    <button type="button"
+                        class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            {% if messages %}
+            <div class="mb-6 space-y-2">
+                {% for message in messages %}
+                <div
+                    class="p-4 border-l-4 rounded bg-white dark:bg-gray-800 border-brand-{{ message.tags|default:'cyan' }} text-gray-700 dark:text-gray-300 font-mono text-sm shadow-sm dark:shadow-none">
+                    <span class="text-brand-{{ message.tags|default:'cyan' }} font-bold">>>></span> {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% block content %}
+            {% endblock %}
+        </div>
+    </main>
+
+    <footer
+        class="bg-white dark:bg-gray-950 border-t border-gray-200 dark:border-gray-800 mt-auto transition-colors duration-300">
+        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+
+                <div class="col-span-1 md:col-span-1">
+                    <span class="font-mono font-bold text-xl tracking-tighter dark:text-gray-100 text-gray-900">
+                        STACK<span class="text-gradient">MART</span>
+                    </span>
+                    <p class="mt-4 text-gray-600 dark:text-gray-500 text-sm">
+                        Built for builders. The #1 marketplace for second-hand IT gear and server components.
+                    </p>
+                    <div class="flex space-x-6 mt-6">
+                        <a href="#" class="text-gray-400 hover:text-brand-cyan transition-colors"><i
+                                class="fa-brands fa-github text-xl"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-brand-pink transition-colors"><i
+                                class="fa-brands fa-discord text-xl"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-brand-purple transition-colors"><i
+                                class="fa-brands fa-twitter text-xl"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-brand-cyan transition-colors"><i
+                                class="fa-brands fa-youtube text-xl"></i></a>
+                    </div>
+                </div>
+
+                <div>
+                    <h3
+                        class="text-sm font-semibold text-gray-500 dark:text-gray-400 tracking-wider uppercase font-mono">
+                        Marketplace</h3>
+                    <ul class="mt-4 space-y-4">
+                        <li><a href="#" class="text-base text-gray-500 hover:text-brand-cyan transition-colors">CPUs &
+                                GPUs</a></li>
+                        <li><a href="#"
+                                class="text-base text-gray-500 hover:text-brand-cyan transition-colors">Mechanical
+                                Keyboards</a></li>
+                        <li><a href="#" class="text-base text-gray-500 hover:text-brand-cyan transition-colors">Server
+                                Racks</a></li>
+                        <li><a href="#"
+                                class="text-base text-gray-500 hover:text-brand-cyan transition-colors">Monitors</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3
+                        class="text-sm font-semibold text-gray-500 dark:text-gray-400 tracking-wider uppercase font-mono">
+                        Company</h3>
+                    <ul class="mt-4 space-y-4">
+                        <li><a href="{% url 'about' %}" class="text-base text-gray-500 hover:text-brand-cyan transition-colors">About
+                                Us</a></li>
+                        <li><a href="{%url 'blog'%}" class="text-base text-gray-500 hover:text-brand-cyan transition-colors">Blog</a>
+                        </li>
+                        <li><a href="#"
+                                class="text-base text-gray-500 hover:text-brand-cyan transition-colors">Careers</a></li>
+                        <li><a href="{% url 'contact'%}" class="text-base text-gray-500 hover:text-brand-cyan transition-colors">Contact
+                                Us</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3
+                        class="text-sm font-semibold text-gray-500 dark:text-gray-400 tracking-wider uppercase font-mono">
+                        Support</h3>
+                    <ul class="mt-4 space-y-4">
+                        <li><a href="#" class="text-base text-gray-500 hover:text-brand-cyan transition-colors">Help
+                                Center</a></li>
+                        <li><a href="#" class="text-base text-gray-500 hover:text-brand-cyan transition-colors">Terms of
+                                Service</a></li>
+                        <li><a href="#" class="text-base text-gray-500 hover:text-brand-cyan transition-colors">Privacy
+                                Policy</a></li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <div
+                class="mt-8 border-t border-gray-200 dark:border-gray-800 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+                <p class="text-base text-gray-500 font-mono text-xs">
+                    &copy; 2026 Stackmart, Inc. Developed By Mitesh Vaid
+                </p>
+                <div class="flex items-center gap-4">
+                    <p class="text-gray-500 text-xs font-mono">
+                        v2.0.4
+                    </p>
+                    <p class="text-gray-500 text-xs font-mono border-l border-gray-700 pl-4">
+                        System: <span class="text-green-600 dark:text-green-500 animate-pulse">ONLINE</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+
+    {% block scripts %}
+    {% endblock %}
+    
+</body>
+
+
+<script>
+    // --- SEARCH PLACEHOLDER ANIMATION ---
+    const searchInput = document.getElementById('nav-search');
+    const placeholders = [
+        "Search GPUs...",
+        "Search Keyboards...",
+        "Search Monitors...",
+        "Search Laptops...",
+        "Search Servers...",
+        "Search Storage..."
+    ];
+    let placeholderIndex = 0;
+
+    function rotatePlaceholder() {
+        if (!searchInput) return;
+
+        // 1. Fade OUT the placeholder text
+        // Tailwind class 'placeholder:text-transparent' hides just the placeholder
+        searchInput.classList.add('placeholder:text-transparent');
+
+        // 2. Wait for the fade out (500ms matches the CSS duration), then swap text
+        setTimeout(() => {
+            placeholderIndex = (placeholderIndex + 1) % placeholders.length;
+            searchInput.setAttribute('placeholder', placeholders[placeholderIndex]);
+
+            // 3. Fade IN the new text
+            searchInput.classList.remove('placeholder:text-transparent');
+        }, 500);
+    }
+
+    // Run the rotation every 3.5 seconds (3000ms pause + 500ms transition)
+    setInterval(rotatePlaceholder, 6000);
+</script>
+
+</html>

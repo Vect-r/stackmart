@@ -1,0 +1,164 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="antialiased">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Stackmart{% endblock %}</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- ✅ Tailwind CDN config MUST be this exact variable -->
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              from: '#7c3aed',
+              to: '#22d3ee'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    .brand-gradient {
+      background: linear-gradient(90deg, #7c3aed, #22d3ee);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    #progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      width: 0%;
+      background: linear-gradient(90deg, #7c3aed, #22d3ee);
+      z-index: 100;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex flex-col bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-200">
+
+  <!-- Scroll progress -->
+  <div id="progress"></div>
+
+  <!-- Header -->
+  <header class="sticky top-0 z-50 bg-white/80 dark:bg-slate-950/80 backdrop-blur border-b border-slate-200 dark:border-slate-800">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+
+      <!-- Logo -->
+      <a href="/" class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-brand-from to-brand-to flex items-center justify-center text-black font-bold">
+          S
+        </div>
+        <span class="text-lg font-semibold brand-gradient">Stackmart</span>
+      </a>
+
+      <!-- Nav -->
+      <nav class="hidden md:flex items-center gap-8 text-sm text-slate-600 dark:text-slate-300">
+        <a href="#" class="hover:text-slate-900 dark:hover:text-white transition">Browse</a>
+        <a href="#" class="hover:text-slate-900 dark:hover:text-white transition">Sell</a>
+        <a href="#" class="hover:text-slate-900 dark:hover:text-white transition">Pricing</a>
+        <a href="#" class="hover:text-slate-900 dark:hover:text-white transition">Docs</a>
+      </nav>
+
+      <!-- Actions -->
+      <div class="flex items-center gap-3">
+
+        <!-- Theme toggle -->
+        <button
+          id="theme-toggle"
+          class="p-2 rounded-md border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+          aria-label="Toggle theme"
+        >
+          <span id="theme-icon"></span>
+        </button>
+
+        <a href="#" class="hidden sm:inline-flex px-4 py-2 text-sm rounded-md border border-slate-300 dark:border-slate-700 hover:border-slate-500 transition">
+          Login
+        </a>
+
+        <a href="#" class="px-4 py-2 text-sm font-medium rounded-md bg-gradient-to-r from-brand-from to-brand-to text-black hover:opacity-90 transition">
+          Sell Now
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="flex-grow">
+    <div class="max-w-7xl mx-auto px-6 py-12">
+      {% block content %}
+      <section class="mb-16">
+        <h1 class="text-4xl md:text-5xl font-extrabold mb-4">
+          Buy & Sell <span class="brand-gradient">IT Products</span>
+        </h1>
+        <p class="max-w-2xl text-slate-600 dark:text-slate-400 text-lg">
+          Stackmart is a developer-first marketplace for software, APIs,
+          scripts, servers, and hardware.
+        </p>
+      </section>
+      {% endblock %}
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-200 dark:border-slate-800">
+    <div class="max-w-7xl mx-auto px-6 py-8 text-center text-sm text-slate-500 dark:text-slate-600">
+      © {% now "Y" %} Stackmart
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script>
+    // Scroll progress
+    const prog = document.getElementById('progress');
+    const doc = document.documentElement;
+    window.addEventListener('scroll', () => {
+      const h = doc.scrollHeight - doc.clientHeight;
+      prog.style.width = (h > 0 ? (doc.scrollTop / h) * 100 : 0) + '%';
+    });
+
+    // Theme toggle (FINAL)
+    const html = document.documentElement;
+    const toggle = document.getElementById('theme-toggle');
+    const icon = document.getElementById('theme-icon');
+
+    const sun = '☀️';
+    const moon = '🌙';
+
+    function setTheme(dark) {
+      html.classList.toggle('dark', dark);
+      localStorage.setItem('theme', dark ? 'dark' : 'light');
+      icon.textContent = dark ? sun : moon;
+    }
+
+    const stored = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    setTheme(stored ? stored === 'dark' : prefersDark);
+
+    toggle.addEventListener('click', () => {
+      setTheme(!html.classList.contains('dark'));
+    });
+  </script>
+
+</body>
+</html>

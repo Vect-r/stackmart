@@ -1,0 +1,130 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Login | Stackmart{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-center min-h-[80vh] px-4">
+    
+    <div class="relative w-full max-w-md p-8 bg-white dark:bg-[#18181b] rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden group">
+        
+        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-pink via-brand-purple to-brand-cyan"></div>
+
+        <div class="text-center mb-8">
+            <h2 class="text-3xl font-mono font-bold tracking-tight mb-2">
+                System.<span class="text-brand-cyan">Login</span>()
+            </h2>
+            <p class="text-gray-500 text-sm font-mono">Enter your credentials to access the terminal.</p>
+        </div>
+
+        <form method="post" action="{% url 'login' %}">
+            {% csrf_token %}
+            
+            {% if form.errors %}
+                <div class="mb-6 p-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900 text-red-600 dark:text-red-400 text-sm font-mono flex items-center gap-3">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <div>
+                        <p class="font-bold">Access Denied</p>
+                        <p class="text-xs opacity-90">Invalid username or password.</p>
+                    </div>
+                </div>
+            {% endif %}
+
+            <div class="space-y-6">
+                <div>
+                    <label for="id_username" class="block text-sm font-medium text-gray-700 dark:text-gray-300 font-mono mb-2">
+                        Username / Email
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fa-solid fa-user-astronaut text-gray-400"></i>
+                        </div>
+                        <input type="text" name="username" autofocus required id="id_username" 
+                            class="block w-full pl-10 px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:border-brand-purple focus:ring-1 focus:ring-brand-purple focus:shadow-[0_0_15px_rgba(121,40,202,0.5)] transition-all duration-300 text-gray-900 dark:text-white sm:text-sm font-mono placeholder-gray-500"
+                            placeholder="dev_01">
+                    </div>
+                </div>
+
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label for="id_password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 font-mono">
+                            Password
+                        </label>
+                        <a href="{% url 'forgot_password' %}" class="text-xs text-brand-purple hover:text-brand-pink transition-colors font-mono">
+                            Forgot password?
+                        </a>
+                    </div>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fa-solid fa-key text-gray-400"></i>
+                        </div>
+                        <input type="password" name="password" required id="id_password" 
+                            class="block w-full pl-10 pr-10 px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:border-brand-purple focus:ring-1 focus:ring-brand-purple focus:shadow-[0_0_15px_rgba(121,40,202,0.5)] transition-all duration-300 text-gray-900 dark:text-white sm:text-sm font-mono placeholder-gray-500"
+                            placeholder="••••••••">
+                        
+                        <button type="button" onclick="toggleLoginPassword()" class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer z-10 focus:outline-none">
+                            <i id="login-eye-icon" class="fa-solid fa-eye text-gray-400 hover:text-brand-purple transition-colors"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" 
+                    class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-lg text-sm font-bold text-white bg-gradient-to-r from-brand-pink to-brand-purple hover:from-brand-pink hover:to-brand-purple hover:brightness-110 hover:shadow-[0_0_20px_rgba(121,40,202,0.5)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-purple transition-all transform hover:-translate-y-0.5 font-mono tracking-wide">
+                    INITIALIZE_SESSION <i class="fa-solid fa-arrow-right ml-2 mt-0.5"></i>
+                </button>
+            </div>
+        </form>
+
+        <div class="relative my-8">
+            <div class="absolute inset-0 flex items-center">
+                <div class="w-full border-t border-gray-200 dark:border-gray-700"></div>
+            </div>
+            <div class="relative flex justify-center text-sm">
+                <span class="px-2 bg-white dark:bg-[#18181b] text-gray-500 font-mono">Or continue with</span>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+            <button type="button" class="flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-brand-purple/50 transition-all gap-2">
+                <i class="fa-brands fa-github text-xl"></i>
+                <span class="font-mono">GitHub</span>
+            </button>
+            <button type="button" class="flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-brand-purple/50 transition-all gap-2">
+                <i class="fa-brands fa-google text-xl text-red-500"></i>
+                <span class="font-mono">Google</span>
+            </button>
+        </div>
+
+        <div class="mt-8 text-center">
+            <p class="text-sm text-gray-500 font-mono">
+                New to the network? 
+                <a href="{% url 'register' %}" class="font-medium text-brand-cyan hover:text-brand-pink transition-colors font-bold">
+                    Create_Account
+                </a>
+            </p>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    function toggleLoginPassword() {
+        const input = document.getElementById('id_password');
+        const icon = document.getElementById('login-eye-icon');
+        
+        if (input.type === "password") {
+            input.type = "text";
+            icon.classList.remove("fa-eye");
+            icon.classList.add("fa-eye-slash");
+            icon.classList.add("text-brand-purple");
+            icon.classList.remove("text-gray-400");
+        } else {
+            input.type = "password";
+            icon.classList.remove("fa-eye-slash");
+            icon.classList.add("fa-eye");
+            icon.classList.remove("text-brand-purple");
+            icon.classList.add("text-gray-400");
+        }
+    }
+</script>
+{% endblock %}
