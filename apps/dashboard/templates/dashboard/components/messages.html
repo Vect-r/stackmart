@@ -1,0 +1,97 @@
+{% if messages %}
+<div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-3 w-full max-w-sm pointer-events-none">
+    {% for message in messages %}
+    
+    <div class="toast-message pointer-events-auto relative overflow-hidden bg-white dark:bg-[#18181b] border-l-4 rounded-r-lg shadow-2xl backdrop-blur-md translate-x-full opacity-0 transition-all duration-500 ease-out transform
+        {% if 'success' in message.tags %}
+            border-green-500 shadow-[0_0_15px_rgba(34,197,94,0.2)]
+        {% elif 'error' in message.tags %}
+            border-red-500 shadow-[0_0_15px_rgba(239,68,68,0.2)]
+        {% elif 'warning' in message.tags %}
+            border-yellow-500 shadow-[0_0_15px_rgba(234,179,8,0.2)]
+        {% else %}
+            border-brand-purple shadow-[0_0_15px_rgba(121,40,202,0.2)]
+        {% endif %}"
+        role="alert">
+
+        <div class="p-4 flex items-start gap-4">
+            <div class="flex-shrink-0 mt-0.5">
+                {% if 'success' in message.tags %}
+                    <i class="fa-solid fa-circle-check text-green-500 text-xl animate-pulse"></i>
+                {% elif 'error' in message.tags %}
+                    <i class="fa-solid fa-circle-xmark text-red-500 text-xl animate-pulse"></i>
+                {% elif 'warning' in message.tags %}
+                    <i class="fa-solid fa-triangle-exclamation text-yellow-500 text-xl animate-pulse"></i>
+                {% else %}
+                    <i class="fa-solid fa-circle-info text-brand-purple text-xl animate-pulse"></i>
+                {% endif %}
+            </div>
+
+            <div class="w-full">
+                <h3 class="font-bold font-mono text-sm text-gray-900 dark:text-white uppercase tracking-wider mb-1">
+                    {% if 'success' in message.tags %}System_Success
+                    {% elif 'error' in message.tags %}System_Error
+                    {% elif 'warning' in message.tags %}System_Warning
+                    {% else %}System_Info{% endif %}
+                </h3>
+                <p class="text-sm text-gray-600 dark:text-gray-300 font-mono leading-tight">
+                    {{ message }}
+                </p>
+            </div>
+
+            <button onclick="closeToast(this.closest('.toast-message'))" class="flex-shrink-0 text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="absolute bottom-0 left-0 h-1 bg-gray-200 dark:bg-gray-700 w-full">
+            <div class="h-full w-full origin-left animate-shrink-width
+                {% if 'success' in message.tags %}bg-green-500
+                {% elif 'error' in message.tags %}bg-red-500
+                {% elif 'warning' in message.tags %}bg-yellow-500
+                {% else %}bg-brand-purple{% endif %}">
+            </div>
+        </div>
+
+    </div>
+    {% endfor %}
+</div>
+
+<style>
+    @keyframes shrink-width {
+        from { transform: scaleX(1); }
+        to { transform: scaleX(0); }
+    }
+    .animate-shrink-width {
+        animation: shrink-width 5s linear forwards;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const toasts = document.querySelectorAll('.toast-message');
+        
+        toasts.forEach((toast, index) => {
+            // 1. Staggered Slide In
+            setTimeout(() => {
+                toast.classList.remove('translate-x-full', 'opacity-0');
+            }, index * 200); // 200ms delay between multiple toasts
+
+            // 2. Auto Dismiss after 5 seconds
+            setTimeout(() => {
+                closeToast(toast);
+            }, 5000 + (index * 200));
+        });
+    });
+
+    function closeToast(toast) {
+        // Slide out
+        toast.classList.add('translate-x-full', 'opacity-0');
+        
+        // Remove from DOM after animation
+        setTimeout(() => {
+            toast.remove();
+        }, 500);
+    }
+</script>
+{% endif %}

@@ -212,6 +212,7 @@
 <body
     class="bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-200 font-sans flex flex-col min-h-screen transition-colors duration-300">
 
+
     <div class="fixed inset-0 z-[-1] pointer-events-none overflow-hidden">
         <div
             class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-brand-purple/30 dark:bg-brand-purple/20 rounded-full blur-3xl opacity-60 dark:opacity-40 animate-pulse-slow">
@@ -476,6 +477,8 @@
 
     {% block scripts %}
     {% endblock %}
+
+    {% include 'dashboard/components/messages.html' %}
     
 </body>
 
