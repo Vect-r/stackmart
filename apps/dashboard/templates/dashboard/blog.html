@@ -6,25 +6,25 @@
 {% block content %}
 
 <div class="relative py-16">
-    <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-brand-purple/10 rounded-full blur-3xl -z-10 animate-pulse-slow"></div>
-    <div class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-brand-cyan/10 rounded-full blur-3xl -z-10 animate-pulse-slow"></div>
+    <div class="absolute top-0 right-0 w-64 h-64 md:w-[500px] md:h-[500px] bg-brand-purple/10 rounded-full blur-3xl -z-10 animate-pulse-slow"></div>
+    <div class="absolute bottom-0 left-0 w-64 h-64 md:w-[500px] md:h-[500px] bg-brand-cyan/10 rounded-full blur-3xl -z-10 animate-pulse-slow"></div>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10 relative">
         <div class="flex flex-col md:flex-row justify-between items-end gap-6 mb-8">
-            <div>
-                <h1 class="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white mb-2 tracking-tight animate-fade-in-up">
+            <div class="w-full">
+                <h1 class="text-3xl md:text-5xl font-extrabold text-gray-900 dark:text-white mb-2 tracking-tight animate-fade-in-up break-all font-mono">
                     /var/log/<span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-pink to-brand-purple">stackmart</span>
                 </h1>
-                <p class="text-xl text-gray-600 dark:text-gray-400 font-mono animate-fade-in-up" style="animation-delay: 100ms;">
+                <p class="text-lg md:text-xl text-gray-600 dark:text-gray-400 font-mono animate-fade-in-up" style="animation-delay: 100ms;">
                     Hardware guides, server builds, and community stories.
                 </p>
             </div>
             
             <div class="w-full md:w-auto animate-fade-in-up" style="animation-delay: 200ms;">
-                <form class="flex gap-2">
+                <form class="flex flex-col sm:flex-row gap-2">
                     <input type="email" placeholder="Enter email for updates..." class="bg-white/50 dark:bg-black/20 border border-gray-300 dark:border-gray-700 rounded-lg px-4 py-2 text-sm font-mono focus:outline-none focus:border-brand-purple w-full md:w-64 backdrop-blur-sm">
-                    <button type="submit" class="bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-4 py-2 rounded-lg text-sm font-bold font-mono hover:opacity-90 transition-opacity">
-                        SUBBSCRIBE
+                    <button type="submit" class="bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-4 py-2 rounded-lg text-sm font-bold font-mono hover:opacity-90 transition-opacity whitespace-nowrap">
+                        SUBSCRIBE
                     </button>
                 </form>
             </div>
@@ -46,7 +46,7 @@
             <h2 class="text-3xl md:text-5xl font-bold text-white mb-4 leading-tight group-hover:text-brand-pink transition-colors">
                 Building the Ultimate Home Lab for Under $500
             </h2>
-            <div class="flex items-center gap-4 text-gray-300 text-sm font-mono">
+            <div class="flex flex-wrap items-center gap-4 text-gray-300 text-sm font-mono">
                 <div class="flex items-center gap-2">
                     <img src="https://ui-avatars.com/api/?name=Alex+Dev&background=random" class="w-6 h-6 rounded-full">
                     <span>Alex_Dev</span>

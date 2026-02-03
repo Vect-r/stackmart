@@ -6,8 +6,8 @@
 {% block content %}
 
 <div class="relative py-20">
-    <div class="absolute top-0 right-0 w-[600px] h-[600px] bg-brand-cyan/10 rounded-full blur-3xl -z-10 animate-pulse-slow"></div>
-    <div class="absolute bottom-0 left-0 w-[600px] h-[600px] bg-brand-pink/10 rounded-full blur-3xl -z-10 animate-pulse-slow"></div>
+    <div class="absolute top-0 right-0 w-64 h-64 md:w-[600px] md:h-[600px] bg-brand-cyan/10 rounded-full blur-3xl -z-10 animate-pulse-slow"></div>
+    <div class="absolute bottom-0 left-0 w-64 h-64 md:w-[600px] md:h-[600px] bg-brand-pink/10 rounded-full blur-3xl -z-10 animate-pulse-slow"></div>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10 relative">
         <h1 class="text-4xl md:text-6xl font-extrabold text-gray-900 dark:text-white mb-6 tracking-tight animate-fade-in-up">
@@ -39,9 +39,9 @@
                                 <i class="fa-solid fa-envelope text-xl"></i>
                             </div>
                         </div>
-                        <div class="ml-4">
+                        <div class="ml-4 overflow-hidden">
                             <p class="text-sm font-medium text-gray-900 dark:text-white font-mono">Support Email</p>
-                            <a href="mailto:help@stackmart.dev" class="text-gray-500 hover:text-brand-cyan transition-colors">help@stackmart.dev</a>
+                            <a href="mailto:help@stackmart.dev" class="text-gray-500 hover:text-brand-cyan transition-colors break-all">help@stackmart.dev</a>
                         </div>
                     </div>
 
@@ -75,12 +75,12 @@
                 </div>
             </div>
 
-            <div class="bg-[#1e1e1e] rounded-xl border border-gray-800 p-6 font-mono text-xs md:text-sm text-gray-400 shadow-lg">
-                <p><span class="text-green-400">user@stackmart</span>:<span class="text-blue-400">~</span>$ ping support</p>
-                <p>PING support.stackmart.dev (192.168.1.1): 56 data bytes</p>
-                <p>64 bytes from 192.168.1.1: icmp_seq=0 ttl=64 time=0.045 ms</p>
-                <p>64 bytes from 192.168.1.1: icmp_seq=1 ttl=64 time=0.032 ms</p>
-                <p><span class="text-green-400">user@stackmart</span>:<span class="text-blue-400">~</span>$ <span class="animate-pulse">_</span></p>
+            <div class="bg-[#1e1e1e] rounded-xl border border-gray-800 p-6 font-mono text-xs md:text-sm text-gray-400 shadow-lg overflow-x-auto">
+                <p class="whitespace-nowrap"><span class="text-green-400">user@stackmart</span>:<span class="text-blue-400">~</span>$ ping support</p>
+                <p class="whitespace-nowrap">PING support.stackmart.dev (192.168.1.1): 56 data bytes</p>
+                <p class="whitespace-nowrap">64 bytes from 192.168.1.1: icmp_seq=0 ttl=64 time=0.045 ms</p>
+                <p class="whitespace-nowrap">64 bytes from 192.168.1.1: icmp_seq=1 ttl=64 time=0.032 ms</p>
+                <p class="whitespace-nowrap"><span class="text-green-400">user@stackmart</span>:<span class="text-blue-400">~</span>$ <span class="animate-pulse">_</span></p>
             </div>
 
         </div>
@@ -88,7 +88,7 @@
         <div class="bg-white dark:bg-[#18181b] rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-800 p-8 sm:p-10 animate-fade-in-up relative overflow-hidden" style="animation-delay: 450ms;">
             <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-cyan via-brand-purple to-brand-pink"></div>
 
-            <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2 font-mono">Ping us at</h3>
+            <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2 font-mono">Send Packet</h3>
             <p class="text-gray-500 text-sm mb-8">We usually respond within 24 hours.</p>
 
             <form action="#" method="POST" class="space-y-6">
@@ -128,7 +128,7 @@
 
                 <button type="submit" 
                     class="w-full flex justify-center py-4 px-4 border border-transparent rounded-lg shadow-lg text-sm font-bold text-white bg-gradient-to-r from-brand-pink to-brand-purple hover:from-brand-pink hover:to-brand-purple hover:brightness-110 hover:shadow-[0_0_20px_rgba(121,40,202,0.5)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-purple transition-all transform hover:-translate-y-0.5 font-mono tracking-wide">
-                    PING US <i class="fa-solid fa-paper-plane ml-2 mt-0.5"></i>
+                    TRANSMIT_DATA <i class="fa-solid fa-paper-plane ml-2 mt-0.5"></i>
                 </button>
             </form>
         </div>
