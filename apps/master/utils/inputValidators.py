@@ -42,4 +42,9 @@ def match_password(password,confirm_password):
         return password
     raise ValidationError("Error: Password Doesn't match. Please Try Again")
 
+def validateUsername(username:str):
+    if username.isalnum():
+        return username
+    raise ValidationError("Username Should be Alphanumeric and without spaces.")
+
     

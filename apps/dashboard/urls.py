@@ -3,6 +3,8 @@ from apps.dashboard.views import *
 
 urlpatterns = [
     path('', index, name='index'),
+    path('dashboard/', dashboard, name='dashboard'),
+    path('logout/', logout, name='logout'),
     path('login/', login, name='login'),
     path('about/', about, name='about'),
     path('register/', register, name='register'),

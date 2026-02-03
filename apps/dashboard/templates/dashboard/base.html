@@ -33,7 +33,6 @@
                     animation: {
                         'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                         'shine': 'shine 1.5s ease-in-out infinite',
-                        // --- FIX 2: RESTORED ANIMATION FOR TYPEWRITER ---
                         'fade-in-up': 'fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
                     },
                     keyframes: {
@@ -41,7 +40,6 @@
                             '0%': { transform: 'translateX(-100%) skewX(12deg)' },
                             '100%': { transform: 'translateX(200%) skewX(12deg)' },
                         },
-                        // --- FIX 2: RESTORED KEYFRAMES ---
                         fadeInUp: {
                             '0%': { opacity: '0', transform: 'translateY(30px)' },
                             '100%': { opacity: '1', transform: 'translateY(0)' },
@@ -53,7 +51,6 @@
     </script>
 
     <script>
-        // Check local storage for theme
         if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
         } else {
@@ -150,6 +147,38 @@
                         <i class="fa-solid fa-moon hidden dark:block"></i>
                     </button>
 
+                    {% if request.isAuthenticated %}
+                    
+                    <div class="relative ml-2">
+                        <button onclick="toggleProfileMenu()" class="flex items-center focus:outline-none transition-transform active:scale-95">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-10 h-10 rounded-full shadow-lg shadow-gray-500/20 hover:ring-2 hover:ring-brand-purple transition-all">
+                                <defs>
+                                    <linearGradient id="user-grad-slate" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" style="stop-color:#94a3b8;stop-opacity:1" /> 
+                                        <stop offset="100%" style="stop-color:#1e293b;stop-opacity:1" /> 
+                                    </linearGradient>
+                                </defs>
+                                <circle cx="12" cy="12" r="12" fill="url(#user-grad-slate)"/>
+                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" fill="#ffffff" fill-opacity="0.95"/>
+                            </svg>
+                        </button>
+
+                        <div id="profile-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-[#18181b] rounded-xl shadow-2xl border border-gray-200 dark:border-gray-800 py-2 z-50 transform origin-top-right transition-all">
+                            <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-800 mb-1">
+                                <p class="text-xs text-gray-500 font-mono">Signed in as</p>
+                                <p class="text-sm font-bold text-gray-900 dark:text-white font-mono truncate">{{  request.authenticated_user.username }}</p>
+                            </div>
+
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-brand-purple transition-colors font-mono">
+                                <i class="fa-solid fa-user mr-2 text-xs"></i> Profile
+                            </a>
+                            <a href="{% url 'logout' %}" class="block px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors font-mono">
+                                <i class="fa-solid fa-arrow-right-from-bracket mr-2 text-xs"></i> Logout
+                            </a>
+                        </div>
+                    </div>
+
+                    {% else %}
                     <a href="{% url 'login' %}"
                         class="relative inline-flex items-center justify-center p-0.5 overflow-hidden text-sm font-medium rounded-lg group bg-gradient-to-br from-brand-pink to-brand-purple group-hover:from-brand-pink group-hover:to-brand-purple hover:text-white text-white focus:ring-4 focus:outline-none focus:ring-purple-200 dark:focus:ring-purple-800">
                         <span class="relative px-5 py-2 transition-all ease-in duration-75 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-md group-hover:bg-opacity-0 group-hover:text-white font-mono font-bold">
@@ -162,6 +191,7 @@
                         <i class="fa-solid fa-user-plus text-sm"></i>
                         <span>Join_Us</span>
                     </a>
+                    {% endif %}
                 </div>
 
                 <div class="-mr-2 flex md:hidden gap-2">
@@ -193,31 +223,6 @@
         </div>
     </nav>
 
-    <!-- <div id="mobile-drawer" class="fixed inset-y-0 right-0 w-72 bg-[#09090b] border-l border-gray-800 transform translate-x-full transition-transform duration-300 ease-in-out z-[60] flex flex-col shadow-2xl h-screen">
-        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-800">
-            <span class="font-mono font-bold text-lg text-white">MENU</span>
-            <button onclick="toggleMobileMenu()" class="text-gray-400 hover:text-white transition-colors">
-                <i class="fa-solid fa-xmark text-2xl"></i>
-            </button>
-        </div>
-
-        <div class="px-4 py-6 space-y-2 flex-grow overflow-y-auto">
-            <a href="/" class="block px-4 py-3 rounded-lg text-base font-medium text-gray-300 hover:text-white hover:bg-white/5 font-mono transition-colors border-l-2 border-transparent hover:border-brand-cyan">Browse Hardware</a>
-            <a href="#" class="block px-4 py-3 rounded-lg text-base font-medium text-gray-300 hover:text-white hover:bg-white/5 font-mono transition-colors border-l-2 border-transparent hover:border-brand-purple">Start Selling</a>
-            <a href="{%url 'blog'%}" class="block px-4 py-3 rounded-lg text-base font-medium text-gray-300 hover:text-white hover:bg-white/5 font-mono transition-colors border-l-2 border-transparent hover:border-brand-pink">DevLog (Blog)</a>
-            <a href="{% url 'about' %}" class="block px-4 py-3 rounded-lg text-base font-medium text-gray-300 hover:text-white hover:bg-white/5 font-mono transition-colors border-l-2 border-transparent hover:border-white">About Us</a>
-            <a href="{% url 'contact' %}" class="block px-4 py-3 rounded-lg text-base font-medium text-gray-300 hover:text-white hover:bg-white/5 font-mono transition-colors border-l-2 border-transparent hover:border-white">Contact</a>
-        </div>
-
-        <div class="p-4 border-t border-gray-800 bg-black/20 space-y-3">
-            <a href="{% url 'register' %}" class="block w-full text-center px-4 py-3 rounded-lg bg-gradient-to-r from-brand-pink to-brand-purple text-white font-bold font-mono shadow-lg">
-                Join_Us
-            </a>
-            <a href="{% url 'login' %}" class="block w-full text-center px-4 py-3 rounded-lg border border-gray-700 text-gray-300 hover:text-white hover:bg-white/5 font-mono transition-colors">
-                Login
-            </a>
-        </div>
-    </div> -->
     <div id="mobile-drawer" class="fixed inset-y-0 right-0 w-72 bg-[#09090b] border-l border-gray-800 transform translate-x-full transition-transform duration-300 ease-in-out z-[60] flex flex-col shadow-2xl h-[100dvh]">
         
         <div class="flex items-center justify-between px-6 py-4 border-b border-gray-800 flex-shrink-0">
@@ -236,12 +241,35 @@
         </div>
 
         <div class="p-4 pb-12 border-t border-gray-800 bg-black/20 space-y-3 flex-shrink-0">
+            
+            {% if request.isAuthenticated %}
+            <a href="#" class="flex items-center justify-center gap-3 w-full px-4 py-3 rounded-lg border border-gray-700 text-gray-200 hover:text-white hover:bg-white/5 font-mono transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-6 h-6 rounded-full shadow-md">
+                    <defs>
+                        <linearGradient id="sm-circle-grad-mono-mobile" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#94a3b8;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#1e293b;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <circle cx="12" cy="12" r="12" fill="url(#sm-circle-grad-mono-mobile)"/>
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" fill="#ffffff" fill-opacity="0.9"/>
+                </svg>
+                <span class="font-bold">{{  request.authenticated_user.username }}</span>
+            </a>
+
+            <a href="{% url 'logout' %}" class="block w-full text-center px-4 py-3 rounded-lg bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500/20 font-bold font-mono transition-colors">
+                Logout
+            </a>
+            
+            {% else %}
             <a href="{% url 'register' %}" class="block w-full text-center px-4 py-3 rounded-lg bg-gradient-to-r from-brand-pink to-brand-purple text-white font-bold font-mono shadow-lg">
                 Join_Us
             </a>
             <a href="{% url 'login' %}" class="block w-full text-center px-4 py-3 rounded-lg border border-gray-700 text-gray-300 hover:text-white hover:bg-white/5 font-mono transition-colors">
                 Login
             </a>
+            {% endif %}
+
         </div>
     </div>
 
@@ -373,5 +401,22 @@
         const searchBar = document.getElementById('mobile-search-bar');
         searchBar.classList.toggle('hidden');
     }
+
+    // --- DESKTOP PROFILE DROPDOWN LOGIC ---
+    function toggleProfileMenu() {
+        const dropdown = document.getElementById('profile-dropdown');
+        dropdown.classList.toggle('hidden');
+    }
+
+    // Close dropdown when clicking outside
+    window.addEventListener('click', function(e) {
+        const dropdown = document.getElementById('profile-dropdown');
+        const button = e.target.closest('button[onclick="toggleProfileMenu()"]');
+        
+        // If clicking outside the dropdown AND not on the button
+        if (!button && !dropdown.contains(e.target)) {
+            dropdown.classList.add('hidden');
+        }
+    });
 </script>
 </html>

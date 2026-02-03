@@ -1,0 +1,8 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Welcome, {{request.authenticated_user.username}} | Stackmart{% endblock %}
+
+{% block content %}
+{{ request.authenticated_user.username }}!
+{% endblock %}
