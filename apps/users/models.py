@@ -25,6 +25,10 @@ class User(BaseClass):
     is_active = models.BooleanField(default=False)
 
 class UserVerification(BaseClass):
+    # VERIFICATION_CHOICE = (
+    #     ('email', 'Mail Verification'),
+    #     ('password', 'Password Reset Verification')
+    # )
     VERIFICATION_CHOICE = (
         ('email', 'Mail Verification'),
         ('password', 'Password Reset Verification')
@@ -35,6 +39,9 @@ class UserVerification(BaseClass):
     token = models.CharField(max_length=255, unique=True)
     isVerifiedByUser = models.BooleanField(default=False)
     expiryDateTime = models.DateTimeField()
+
+    def __str__(self):
+        return f"Type: {self.verification_type}, {self.user.username}"
 
     def is_expired(self):
         return timezone.now() > self.expiryDateTime
