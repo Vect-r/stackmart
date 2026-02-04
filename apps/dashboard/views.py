@@ -12,6 +12,10 @@ from django.contrib.sites.shortcuts import get_current_site
 from datetime import datetime, timedelta, UTC
 from apps.users.forms import PasswordResetForm
 from .mailings import MailSender
+from django.views.decorators.http import require_POST
+from django.http import JsonResponse
+import json
+from django.utils import timezone
 
 mailObj = MailSender()
 
@@ -38,6 +42,8 @@ def login(request):
                 return redirect('login')
 
             if getUser:
+                getUser.last_login = timezone.now()
+                getUser.save()
                 token = generate_token(getUser)
                 
                 response = redirect('dashboard')
@@ -214,20 +220,67 @@ def verifyNewMail(request,tokenId):
             vObj.save()
     except UserVerification.DoesNotExist:
         status = False
-    
+
+    if vObj.user.is_active:
+        approval = ""
+    else:
+        approval = "But your account is pending approval. Once Approved we will send you a mail. Please Contact Support for any queries."    
     
     return render(request,'dashboard/mail_verification.html',{'valid_link':status,
-                                                              'approval':"But your account is pending approval. Once Approved we will send you a mail. Please Contact Support for any queries."})
+                                                              'approval':approval})
     
-
-def verifyChangeMail(request,tokenId):
-    messages.success('Your Mail Has Been Changed. Please login with new mail')
-    return redirect('index')
-
 @login_required_jwt
 def profile(request):
     user = request.authenticated_user
-    return render(request,'dashboard/profile.html',{'user':user})
+    isDefaultAvatar=User._meta.get_field('profile').get_default()==user.profile
+    return render(request,'dashboard/profile.html',{'user':user,'isDefaultAvatar':isDefaultAvatar})
+
+@login_required_jwt
+@require_POST
+def profileUpdate(request):
+    user = request.authenticated_user
+    
+    # 1. Handle Text Data
+    email = request.POST.get('email')
+    mobile = request.POST.get('mobile')
+    remove_avatar = request.POST.get('remove_avatar') # Check for removal flag
+    
+    # Validation
+    message = ""
+    try:
+        if email and email != user.email:
+            if type(user).objects.filter(email=email).exclude(pk=user.pk).exists():
+                return JsonResponse({'status': 'error', 'message': 'Email already in use.'}, status=400)
+            user.email = is_valid_email(email)
+            message += f"Verification Mail has been sent to {email}. Please verify it within 24 Hours or your account will be deactivated."
+            vObj = UserVerification(verification_type="email",user = user,expiryDateTime = timezone.now()+timedelta(days=1))
+            vObj.save()
+            mailObj.sendMailVerification(user,vObj.id,request,vType="mailChange")
+
+        if mobile:
+            user.mobile = is_valid_mobile(mobile)
+    except ValidationError as e:
+        error_text = '; '.join(e.messages)
+        return JsonResponse({'status': 'error', 'message': error_text}, status=400)
+
+    # 2. Handle Avatar Logic
+    if remove_avatar == 'true':
+        # If user wants to delete the picture
+        message+= "User Avatar Removed"
+        user.remove_profile_picture()
+
+    elif 'avatar' in request.FILES:
+        # If user is uploading a new picture
+        message+= "Changed User Avatar"
+        user.profile = request.FILES['avatar']
+
+    user.save()
+
+    return JsonResponse({
+        'status': 'success',
+        'message': f'Done. {message}',
+        'new_avatar_url': user.profile.url
+    })
 
 
 def blog(request):

@@ -6,14 +6,17 @@ from django.contrib.sites.shortcuts import get_current_site
 
 
 class MailSender():
-    stores={'passwordReset':{'path':'dashboard/mails/password_reset.html','subject':'Reset Your Stackmart Credentials'},
+    stores={
+            'passwordReset':{'path':'dashboard/mails/password_reset.html','subject':'Reset Your Stackmart Credentials'},
             'passwordResetSuccess':{'path':'dashboard/mails/password_reset_success.html','subject':'Security Alert: Password Changed'},
-            'mail':{'path':'dashboard/mails/account_verification.html','subject':'Stackmart: Verify Your Identity'}}
+            'mail':{'path':'dashboard/mails/account_verification.html','subject':'Stackmart: Verify Your Identity'},
+            'mailChange':{'path':'dashboard/mails/change_mail_verification.html','subject':'Action Required: Verify Email Update'}
+            }
     
-    def sendMailVerification(self,user,tokenId,request):
+    def sendMailVerification(self,user,tokenId,request,vType='mail'):
         domain = get_current_site(request).domain
         verification_url = f"http://{domain}/verify-mail/{tokenId}/"
-        html_message = render_to_string(self.stores['mail']['path'], {
+        html_message = render_to_string(self.stores[vType]['path'], {
              'user': user,
              'verification_url': verification_url,
              })
@@ -22,7 +25,7 @@ class MailSender():
 
     # 3. Send
         send_mail(
-            self.stores['mail']['subject'],
+            self.stores[vType]['subject'],
             plain_message,
             settings.DEFAULT_FROM_EMAIL,
             [user.email],
