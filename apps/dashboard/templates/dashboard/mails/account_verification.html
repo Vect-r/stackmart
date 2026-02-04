@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Verify Your Identity</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #09090b; font-family: 'Courier New', Courier, monospace; color: #e4e4e7;">
+    
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #09090b; padding: 40px 0;">
+        <tr>
+            <td align="center">
+                
+                <table border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #18181b; border: 1px solid #27272a; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);">
+                    
+                    <tr>
+                        <td height="4" style="background: linear-gradient(90deg, #ff0080 0%, #7928ca 50%, #00dfd8 100%);"></td>
+                    </tr>
+
+                    <tr>
+                        <td align="center" style="padding: 40px 0 20px 0;">
+                            <span style="font-size: 24px; font-weight: bold; letter-spacing: -1px; color: #ffffff;">
+                                STACK<span style="color: #00dfd8;">MART</span>
+                            </span>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding: 0 40px 40px 40px; text-align: center;">
+                            
+                            <h1 style="color: #ffffff; font-size: 22px; margin-bottom: 20px; font-family: 'Courier New', monospace;">
+                                &gt; New_User_Detected
+                            </h1>
+
+                            <p style="color: #ffffff; font-size: 16px; margin-bottom: 20px;">
+                                Welcome to the network, <strong>{{ user.username }}</strong>.
+                            </p>
+                            
+                            <p style="color: #a1a1aa; font-size: 14px; line-height: 1.6; margin-bottom: 30px;">
+                                Your account has been successfully created on our servers. To activate your credentials and begin trading hardware, we need to verify your email handshake.
+                            </p>
+
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 30px;">
+                                <tr>
+                                    <td align="center">
+                                        <a href="{{ verification_url }}" style="display: inline-block; padding: 14px 30px; background-color: #00dfd8; color: #000000; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 14px; letter-spacing: 1px; border: 1px solid #00dfd8; text-transform: uppercase;">
+                                            Confirm_Email()
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <p style="color: #52525b; font-size: 12px; margin-bottom: 0;">
+                                // This link expires in 24 hours.<br>
+                                If you did not create this account, please terminate this message.
+                            </p>
+
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="background-color: #000000; padding: 20px; text-align: center; border-top: 1px solid #27272a;">
+                            <p style="color: #52525b; font-size: 12px; margin: 0;">
+                                &copy; 2026 Stackmart, Inc. | Verification Protocol v2.0
+                            </p>
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

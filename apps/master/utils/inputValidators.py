@@ -1,7 +1,8 @@
 import re
+from django.core.exceptions import ValidationError
 
-class ValidationError(Exception):
-    pass
+# class ValidationError(Exception):
+#     pass
 
 
 def is_valid_email(email):

@@ -1,0 +1,85 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}
+{%if valid_link%}
+Email Verified
+{%else%}
+Link Expired 
+{%endif%}
+| Stackmart{% endblock %}
+
+{% block content %}
+{% if valid_link %}
+<div class="flex items-center justify-center min-h-[70vh] px-4">
+    
+    <div class="relative w-full max-w-md p-8 bg-white dark:bg-[#18181b] rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden text-center group">
+        
+        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-400 via-brand-cyan to-green-400"></div>
+
+        <div class="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-green-100 dark:bg-green-900/20 mb-6 group-hover:scale-110 transition-transform duration-300">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-10 h-10 text-green-500 dark:text-green-400">
+                <path fill-rule="evenodd" d="M12.516 2.17a.75.75 0 00-1.032 0 11.209 11.209 0 01-7.877 3.08.75.75 0 00-.722.515A12.74 12.74 0 002.25 9.75c0 5.942 4.064 10.933 9.563 12.348a.749.749 0 00.374 0c5.499-1.415 9.563-6.406 9.563-12.348 0-1.352-.172-2.64-.485-3.876a.75.75 0 00-.722-.515 11.208 11.208 0 01-7.877-3.08zM12 15.75a.75.75 0 01-.53-.22l-3-3a.75.75 0 011.06-1.06l2.47 2.47 5.47-5.47a.75.75 0 111.06 1.06l-6 6a.75.75 0 01-.53.22z" clip-rule="evenodd" />
+            </svg>
+        </div>
+
+        <h2 class="text-2xl font-mono font-bold text-gray-900 dark:text-white mb-2 tracking-tight">
+            Mail <span class="text-green-500">Verfied</span>
+        </h2>
+        
+        <p class="text-gray-500 dark:text-gray-400 font-mono text-sm mb-8 leading-relaxed">
+            Identity verified. Your digital signature has been accepted into the network. {{approval}}
+        </p>
+
+        <div class="space-y-4">
+            <a href="{%url 'index' %}" class="w-full flex items-center justify-center px-6 py-3 rounded-lg border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-mono hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                Return_Home
+            </a>
+        </div>
+
+        <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center text-xs font-mono text-gray-400">
+            <span>Status: <span class="text-green-500">ACTIVE</span></span>
+            <span>Latency: 12ms</span>
+        </div>
+
+    </div>
+</div>
+{% else %}
+<div class="flex items-center justify-center min-h-[70vh] px-4">
+    
+    <div class="relative w-full max-w-md p-8 bg-white dark:bg-[#18181b] rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden text-center">
+        
+        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-500 via-orange-500 to-red-500"></div>
+
+        <div class="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-red-100 dark:bg-red-900/20 mb-6">
+            <i class="fa-solid fa-link-slash text-4xl text-red-500 dark:text-red-400"></i>
+        </div>
+
+        <h2 class="text-2xl font-mono font-bold text-gray-900 dark:text-white mb-2 tracking-tight">
+            Connection_<span class="text-red-500">Refused</span>
+        </h2>
+        
+        <p class="text-gray-500 dark:text-gray-400 font-mono text-sm mb-8 leading-relaxed">
+            The verification handshake failed. This link is either invalid, has expired, or has already been consumed.
+        </p>
+
+        <div class="space-y-3">
+            <a href="#" class="w-full flex items-center justify-center px-6 py-3 rounded-lg bg-gray-900 dark:bg-white text-white dark:text-black font-bold font-mono hover:scale-[1.02] transition-transform shadow-lg">
+                <i class="fa-solid fa-rotate-right mr-2"></i> Request_New_Link
+            </a>
+
+            <a href="/" class="w-full flex items-center justify-center px-6 py-3 rounded-lg border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-mono hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                Return_Home
+            </a>
+        </div>
+
+        <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800">
+            <p class="text-xs text-gray-400 font-mono">
+                Error Code: 410_GONE
+            </p>
+        </div>
+
+    </div>
+</div>
+{% endif %}
+{% endblock %}

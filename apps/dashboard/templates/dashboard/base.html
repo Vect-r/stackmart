@@ -169,7 +169,7 @@
                                 <p class="text-sm font-bold text-gray-900 dark:text-white font-mono truncate">{{  request.authenticated_user.username }}</p>
                             </div>
 
-                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-brand-purple transition-colors font-mono">
+                            <a href="{%url 'profile'%}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-brand-purple transition-colors font-mono">
                                 <i class="fa-solid fa-user mr-2 text-xs"></i> Profile
                             </a>
                             <a href="{% url 'logout' %}" class="block px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors font-mono">
@@ -243,7 +243,7 @@
         <div class="p-4 pb-12 border-t border-gray-800 bg-black/20 space-y-3 flex-shrink-0">
             
             {% if request.isAuthenticated %}
-            <a href="#" class="flex items-center justify-center gap-3 w-full px-4 py-3 rounded-lg border border-gray-700 text-gray-200 hover:text-white hover:bg-white/5 font-mono transition-colors">
+            <a href="{% url 'profile'%}" class="flex items-center justify-center gap-3 w-full px-4 py-3 rounded-lg border border-gray-700 text-gray-200 hover:text-white hover:bg-white/5 font-mono transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-6 h-6 rounded-full shadow-md">
                     <defs>
                         <linearGradient id="sm-circle-grad-mono-mobile" x1="0%" y1="0%" x2="100%" y2="100%">

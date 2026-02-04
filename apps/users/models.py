@@ -36,12 +36,12 @@ class UserVerification(BaseClass):
     verification_type = models.CharField(max_length=50, choices=VERIFICATION_CHOICE)
     # Changed to CASCADE to keep database clean
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="verifications")
-    token = models.CharField(max_length=255, unique=True)
     isVerifiedByUser = models.BooleanField(default=False)
     expiryDateTime = models.DateTimeField()
 
     def __str__(self):
         return f"Type: {self.verification_type}, {self.user.username}"
 
-    def is_expired(self):
+    @property
+    def isTimeExpired(self):
         return timezone.now() > self.expiryDateTime

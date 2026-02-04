@@ -1,0 +1,102 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Profile | Stackmart{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-12">
+    
+    <div class="relative bg-white dark:bg-[#18181b] rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+        
+        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-pink via-brand-purple to-brand-cyan"></div>
+
+        <div class="p-8 md:p-10 border-b border-gray-100 dark:border-gray-800">
+            <div class="flex flex-col md:flex-row items-center gap-6 md:gap-8">
+                
+                <div class="flex-shrink-0">
+                    <img src="/media/defaults/user-avatar.svg" 
+                         alt="User Avatar" 
+                         class="w-24 h-24 md:w-32 md:h-32 rounded-full shadow-2xl shadow-gray-500/20 object-cover border-4 border-white dark:border-[#18181b]">
+                </div>
+
+                <div class="text-center md:text-left flex-grow">
+                    <h1 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white font-mono tracking-tight mb-2">
+                        {{ user.username }}
+                    </h1>
+                    
+                    <div class="flex flex-wrap justify-center md:justify-start gap-3">
+                        {% if user.user_type == 'seller' %}
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-brand-purple/10 text-brand-purple border border-brand-purple/20 font-mono uppercase tracking-wider">
+                                <i class="fa-solid fa-store mr-2"></i> Seller_Account
+                            </span>
+                        {% else %}
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-brand-cyan/10 text-brand-cyan border border-brand-cyan/20 font-mono uppercase tracking-wider">
+                                <i class="fa-solid fa-cart-shopping mr-2"></i> Buyer_Account
+                            </span>
+                        {% endif %}
+
+                        {% if user.is_active %}
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-green-500/10 text-green-500 border border-green-500/20 font-mono uppercase tracking-wider">
+                                <i class="fa-solid fa-circle-check mr-2"></i> Active
+                            </span>
+                        {% else %}
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-red-500/10 text-red-500 border border-red-500/20 font-mono uppercase tracking-wider">
+                                <i class="fa-solid fa-ban mr-2"></i> Inactive
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div>
+                    <a href="#" class="inline-flex items-center justify-center px-6 py-2 border border-gray-300 dark:border-gray-700 rounded-lg text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors font-mono">
+                        <i class="fa-solid fa-pen-to-square mr-2"></i> Edit
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-8 md:p-10 bg-gray-50/50 dark:bg-black/20">
+            <h3 class="text-sm font-bold text-gray-500 dark:text-gray-400 font-mono uppercase tracking-widest mb-6 border-b border-gray-200 dark:border-gray-800 pb-2">
+                User_Parameters
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <div class="group">
+                    <label class="block text-xs text-gray-500 font-mono mb-1">Email Address</label>
+                    <div class="flex items-center text-gray-900 dark:text-white font-mono text-lg p-3 bg-white dark:bg-[#1f1f23] rounded-lg border border-gray-200 dark:border-gray-700 group-hover:border-brand-purple/50 transition-colors">
+                        <i class="fa-solid fa-envelope text-gray-400 mr-3 text-sm"></i>
+                        {{ user.email }}
+                    </div>
+                </div>
+
+                <div class="group">
+                    <label class="block text-xs text-gray-500 font-mono mb-1">Mobile Contact</label>
+                    <div class="flex items-center text-gray-900 dark:text-white font-mono text-lg p-3 bg-white dark:bg-[#1f1f23] rounded-lg border border-gray-200 dark:border-gray-700 group-hover:border-brand-cyan/50 transition-colors">
+                        <i class="fa-solid fa-phone text-gray-400 mr-3 text-sm"></i>
+                        {{ user.mobile }}
+                    </div>
+                </div>
+
+                <div class="group">
+                    <label class="block text-xs text-gray-500 font-mono mb-1">System Entry Date</label>
+                    <div class="flex items-center text-gray-900 dark:text-white font-mono text-lg p-3 bg-white dark:bg-[#1f1f23] rounded-lg border border-gray-200 dark:border-gray-700">
+                        <i class="fa-solid fa-calendar-day text-gray-400 mr-3 text-sm"></i>
+                        {{ user.created_at|date:"F j, Y"|default:"Unknown" }}
+                    </div>
+                </div>
+
+                
+
+            </div>
+        </div>
+
+        <div class="p-6 border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-[#18181b]">
+            <p class="text-xs text-center text-gray-400 font-mono">
+                User ID: <span class="text-gray-600 dark:text-gray-500">{{ user.pk }}</span> • Last Login: <span class="text-gray-600 dark:text-gray-500">{{ user.last_login|timesince }} ago</span>
+            </p>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

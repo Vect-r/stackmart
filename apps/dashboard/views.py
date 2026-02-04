@@ -8,9 +8,12 @@ from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.conf import settings
-from uuid import uuid4
 from django.contrib.sites.shortcuts import get_current_site
 from datetime import datetime, timedelta, UTC
+from apps.users.forms import PasswordResetForm
+from .mailings import MailSender
+
+mailObj = MailSender()
 
 # Create your views here.
 def index(request):
@@ -61,6 +64,8 @@ def dashboard(request):
 def about(request):
     return render(request, "dashboard/about.html")
 
+
+
 @never_cache
 def register(request):
     if request.method=="POST":
@@ -85,6 +90,13 @@ def register(request):
                 password=password_
             )
             new_user.save()
+            vObj = UserVerification()
+            vObj.verification_type = "email"
+            vObj.user = new_user
+            vObj.expiryDateTime = datetime.now(UTC)+timedelta(days=1)
+            vObj.save()
+            mailObj.sendMailVerification(new_user,vObj.id,request)
+            
             messages.success(request,"Account Created Sucessfully...")
             return redirect('login')
         except ValidationError as e:
@@ -106,36 +118,36 @@ def forgot_password(request):
             email_ = is_valid_email(request.POST['email'])
             getUser = User.objects.get(email=email_)
             if getUser:
-                token = str(uuid4())
-                domain = get_current_site(request).domain
-                reset_url = f"http://{domain}/reset-password/{token}/"
                 vObj = UserVerification()
                 vObj.verification_type = 'password'
                 vObj.user = getUser
-                vObj.token = token
                 vObj.expiryDateTime = datetime.now(UTC)+timedelta(days=1)
                 vObj.save()
-                print(vObj)
-                subject = 'Reset Your Stackmart Credentials'
-            
-                # 1. Render the HTML template with data
-                html_message = render_to_string('dashboard/mails/password_reset.html', {
-                    'user': getUser,
-                    'reset_url': reset_url,
-                })
+                print(vObj.id)
                 
-                # 2. Create a plain text version (for email clients that disable HTML)
-                plain_message = strip_tags(html_message)
+                # subject = 'Reset Your Stackmart Credentials'
+                # domain = get_current_site(request).domain
+                # reset_url = f"http://{domain}/reset-password/{vObj.id}/"
                 
-                # 3. Send
-                send_mail(
-                    subject,
-                    plain_message,
-                    settings.DEFAULT_FROM_EMAIL,  # e.g., 'system@stackmart.dev'
-                    [email_],
-                    html_message=html_message,
-                    fail_silently=False,
-                )
+                # # 1. Render the HTML template with data
+                # html_message = render_to_string('dashboard/mails/password_reset.html', {
+                #     'user': getUser,
+                #     'reset_url': reset_url,
+                # })
+                
+                # # 2. Create a plain text version (for email clients that disable HTML)
+                # plain_message = strip_tags(html_message)
+                
+                # # 3. Send
+                # send_mail(
+                #     subject,
+                #     plain_message,
+                #     settings.DEFAULT_FROM_EMAIL,  # e.g., 'system@stackmart.dev'
+                #     [email_],
+                #     html_message=html_message,
+                #     fail_silently=False,
+                # )
+                mailObj.sendPasswordReset(request,vObj.id,getUser,email_)
                 messages.success(request,f'Password Reset mail has been sent to {email_}. Please check your Inbox')
                 return redirect('login')
         except ValidationError as e:
@@ -143,8 +155,81 @@ def forgot_password(request):
             return redirect('forget_password')
     return render(request, "dashboard/forgot_password.html")
 
-def reset_password(request):
-    return render(request, "dashboard/reset_password.html")
+def reset_password(request,tokenId):
+    try:
+        getVerificationTicket = UserVerification.objects.get(id=tokenId)
+        form = PasswordResetForm() 
+        if getVerificationTicket.isTimeExpired or getVerificationTicket.isVerifiedByUser:
+            form=None
+            validLink=False
+        else:
+            validLink=True
+    except UserVerification.DoesNotExist:
+        form = None
+        validLink=False
+        # return render(request, 'dashboard/reset_password.html', {
+        # 'validlink': False,  # <--- Forces the "Valid" UI state
+        # 'form': None  
+
+    if request.method=="POST":
+        form = PasswordResetForm(request.POST)
+        if form.is_valid():
+            password_ = form.cleaned_data["password"]
+            getUser = getVerificationTicket.user
+            getUser.password = hash_password(password_)
+            getUser.save()
+            getVerificationTicket.isVerifiedByUser = True
+            getVerificationTicket.save()
+            subject = 'Security Alert: Password Changed'
+            html_message = render_to_string('dashboard/mails/password_reset_success.html', {
+                'user': getUser,
+            })
+            plain_message = strip_tags(html_message)
+
+        # 3. Send the notification
+            send_mail(
+                subject,
+                plain_message,
+                settings.DEFAULT_FROM_EMAIL,
+                [getUser.email],
+                html_message=html_message,
+                fail_silently=True, # Don't crash the user flow if mail fails
+            )
+            messages.success(request,'Password Reset Successful.')
+            return redirect('login')
+    return render(request, 'dashboard/reset_password.html', {
+        'validlink': validLink,  # <--- Forces the "Valid" UI state
+        'form': form,
+        'token': tokenId
+    })
+
+def verifyNewMail(request,tokenId):
+    try:
+        vObj = UserVerification.objects.get(id=tokenId)
+        if vObj.isTimeExpired or vObj.isVerifiedByUser:
+            status = False
+        else:
+            status = True
+            vObj.isVerifiedByUser = True
+            vObj.save()
+    except UserVerification.DoesNotExist:
+        status = False
+    
+    
+    return render(request,'dashboard/mail_verification.html',{'valid_link':status,
+                                                              'approval':"But your account is pending approval. Once Approved we will send you a mail. Please Contact Support for any queries."})
+    
+
+def verifyChangeMail(request,tokenId):
+    messages.success('Your Mail Has Been Changed. Please login with new mail')
+    return redirect('index')
+
+@login_required_jwt
+def profile(request):
+    user = request.authenticated_user
+    return render(request,'dashboard/profile.html',{'user':user})
+
 
 def blog(request):
+
     return render(request, "dashboard/blog.html")
