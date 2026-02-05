@@ -85,7 +85,7 @@ class SellerProfile(BaseClass):
 
     # Basic Info
     business_name = models.CharField(max_length=255, help_text="Brand name or Company name")
-    profile_pic = models.ImageField(upload_to=bizz_profile_upload_path, blank=True, null=True)
+    profile_pic = models.ImageField(upload_to=bizz_profile_upload_path, blank=True, null=True, default="defaults/seller-avatar.svg")
     description = models.TextField(blank=True)
     
     # Address (Simple text for now, or you can make a separate Address model later)
@@ -105,9 +105,9 @@ class SellerProfile(BaseClass):
     
 
     def remove_profile_picture(self):
-        if self.profile_pic and self.profile_pic.name != "defaults/user-avatar.svg":
+        if self.profile_pic and self.profile_pic.name != "defaults/seller-avatar.svg":
             self.profile_pic.delete(save=False)
-        self.profile_pic = "defaults/user-avatar.svg"
+        self.profile_pic = "defaults/seller-avatar.svg"
         self.save()
     
     

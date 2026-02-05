@@ -1,0 +1,295 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Edit Profile | Stackmart{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-start justify-center p-4 md:p-8 pt-16 md:pt-24">
+    
+    <div class="w-full max-w-6xl bg-[#18181b]/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 overflow-hidden flex flex-col md:flex-row min-h-[600px]">
+        
+        <div class="w-full md:w-1/4 bg-black/20 border-r border-white/10 p-6 flex flex-col">
+            <h2 class="text-lg font-bold font-mono text-white mb-8 pl-2 border-l-2 border-brand-purple">
+                Edit_Settings()
+            </h2>
+            
+            <nav class="space-y-2">
+                <button type="button" onclick="switchTab('basic')" id="tab-btn-basic" class="w-full text-left px-4 py-3 rounded-lg font-mono text-sm text-white bg-white/5 border border-white/10 transition-all">
+                    1. Basic Info
+                </button>
+                <button type="button" onclick="switchTab('services')" id="tab-btn-services" class="w-full text-left px-4 py-3 rounded-lg font-mono text-sm text-gray-400 hover:bg-white/5 transition-all">
+                    2. Services
+                </button>
+                <button type="button" onclick="switchTab('socials')" id="tab-btn-socials" class="w-full text-left px-4 py-3 rounded-lg font-mono text-sm text-gray-400 hover:bg-white/5 transition-all">
+                    3. Social Links
+                </button>
+            </nav>
+
+            <div class="mt-auto pt-6 border-t border-white/10">
+                <a href="{% url 'sellerProfileView' %}" class="flex items-center gap-2 text-xs font-mono text-gray-500 hover:text-white transition-colors">
+                    <i class="fa-solid fa-arrow-left"></i> Return to Profile
+                </a>
+            </div>
+        </div>
+
+        <div class="w-full md:w-3/4 p-8 bg-[#18181b] relative">
+            <form method="POST" enctype="multipart/form-data" class="h-full flex flex-col">
+                {% csrf_token %}
+
+                <div id="tab-content-basic" class="tab-content space-y-6 animate-fade-in">
+                    <h3 class="text-xl font-bold text-white font-mono mb-6 border-b border-white/10 pb-4">Basic Information</h3>
+                    
+                    <div class="flex items-center gap-6">
+                        <div class="relative group">
+                            <img id="profile-preview" 
+                                 src="{% if seller.profile_pic %}{{ seller.profile_pic.url }}{% else %}{% static 'images/default_avatar.svg' %}{% endif %}" 
+                                 class="w-28 h-28 rounded-full object-cover border-4 border-[#18181b] bg-[#18181b] transition-all duration-300
+                                        {% if seller.seller_type == 'business' %}
+                                            ring-2 ring-brand-purple shadow-[0_0_20px_rgba(121,40,202,0.5)]
+                                        {% else %}
+                                            ring-2 ring-brand-cyan shadow-[0_0_20px_rgba(0,223,216,0.5)]
+                                        {% endif %}">
+                            
+                            <label for="profile_upload" class="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity backdrop-blur-sm z-10">
+                                <i class="fa-solid fa-camera text-white text-xl drop-shadow-lg"></i>
+                            </label>
+                            
+                            <input type="file" id="profile_upload" name="profile_pic" accept="image/*" class="hidden" onchange="previewImage(this)">
+                        </div>
+                        
+                        <div>
+                            <p class="text-white font-mono text-sm font-bold mb-1">Profile Logo</p>
+                            <p class="text-gray-500 text-xs font-mono mb-2">JPG, PNG or GIF. Max 2MB.</p>
+                            
+                            <span class="inline-flex items-center px-2 py-1 rounded text-[10px] font-bold font-mono border uppercase tracking-wider
+                                {% if seller.seller_type == 'business' %}
+                                    bg-brand-purple/10 text-brand-purple border-brand-purple/20
+                                {% else %}
+                                    bg-brand-cyan/10 text-brand-cyan border-brand-cyan/20
+                                {% endif %}">
+                                {{ seller.get_seller_type_display }} Account
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="grid gap-6">
+                        <div>
+                            <label class="block text-xs font-mono text-gray-400 mb-2">Display Name</label>
+                            <input type="text" name="business_name" value="{{ seller.business_name }}" class="w-full bg-black/30 border border-white/10 rounded-lg p-3 text-white focus:border-brand-purple outline-none font-mono" required>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-mono text-gray-400 mb-2">Company Overview</label>
+                            <textarea name="description" rows="4" class="w-full bg-black/30 border border-white/10 rounded-lg p-3 text-white focus:border-brand-purple outline-none font-mono">{{ seller.description }}</textarea>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-mono text-gray-400 mb-2">Location / Address</label>
+                            <textarea name="address" rows="2" class="w-full bg-black/30 border border-white/10 rounded-lg p-3 text-white focus:border-brand-purple outline-none font-mono" required>{{ seller.address }}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-content-services" class="tab-content hidden space-y-6 animate-fade-in">
+                    <h3 class="text-xl font-bold text-white font-mono mb-6 border-b border-white/10 pb-4">Services & Expertise</h3>
+                    
+                    <div>
+                        <label class="block text-xs font-mono text-gray-400 mb-2">My Services</label>
+                        <div id="services-chips-container" class="flex flex-wrap gap-2 mb-3 min-h-[40px] p-2 bg-black/20 rounded-lg border border-white/5"></div>
+                        
+                        <div class="relative">
+                            <input type="text" id="service-input" class="w-full bg-black/30 border border-white/10 rounded-lg p-3 pl-10 text-white focus:border-brand-cyan outline-none font-mono" placeholder="Add a service...">
+                            <i class="fa-solid fa-search absolute left-3 top-3.5 text-gray-500 text-sm"></i>
+                            <div id="service-suggestions" class="hidden absolute z-10 w-full bg-[#1f1f23] border border-white/10 rounded-lg mt-1 max-h-40 overflow-y-auto shadow-xl"></div>
+                        </div>
+                        <input type="hidden" name="services_list" id="hidden-services-list">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-mono text-gray-400 mb-2">Add Custom Service (Admin Approval)</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="unavailable-input" class="flex-grow bg-black/30 border border-white/10 rounded-lg p-3 text-white focus:border-brand-pink outline-none font-mono" placeholder="Custom Name...">
+                            <button type="button" onclick="addCustomService()" class="px-4 bg-white/5 border border-white/10 rounded-lg text-white hover:bg-white/10 font-mono">Add</button>
+                        </div>
+                        <div id="unavailable-chips-container" class="flex flex-wrap gap-2 mt-2"></div>
+                        <input type="hidden" name="unavailable_list" id="hidden-unavailable-list">
+                    </div>
+                </div>
+
+                <div id="tab-content-socials" class="tab-content hidden space-y-6 animate-fade-in">
+                    <h3 class="text-xl font-bold text-white font-mono mb-6 border-b border-white/10 pb-4">Social Links</h3>
+                    
+                    <div id="socials-list-container" class="space-y-3">
+                        </div>
+                    
+                    <div class="p-4 bg-black/20 rounded-lg border border-white/5 mt-4">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            <select id="new-social-platform" class="bg-[#18181b] border border-white/10 rounded p-2 text-white text-sm font-mono outline-none">
+                                {% for key, label in social_media_platforms.items %}
+                                    <option value="{{ key }}">{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                            <input type="url" id="new-social-url" class="md:col-span-2 bg-[#18181b] border border-white/10 rounded p-2 text-white text-sm font-mono outline-none" placeholder="https://...">
+                        </div>
+                        <button type="button" onclick="addSocialLink()" class="w-full mt-3 py-2 bg-brand-cyan/10 text-brand-cyan border border-brand-cyan/20 rounded text-sm font-bold font-mono hover:bg-brand-cyan/20">
+                            + Add Link
+                        </button>
+                    </div>
+                    <input type="hidden" name="socials_json" id="hidden-socials-json">
+                </div>
+
+                <div class="mt-auto pt-8 border-t border-white/10 flex justify-end">
+                    <button type="submit" class="px-8 py-3 bg-gradient-to-r from-brand-cyan to-brand-purple text-white font-bold rounded-lg hover:brightness-110 shadow-lg font-mono">
+                        Save_Changes()
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- 1. TAB LOGIC ---
+    function switchTab(tabName) {
+        // Hide all content
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+        // Show selected
+        document.getElementById(`tab-content-${tabName}`).classList.remove('hidden');
+        
+        // Reset Nav Styles
+        const navBtns = document.querySelectorAll('nav button');
+        navBtns.forEach(btn => {
+            btn.classList.remove('bg-white/5', 'border-white/10', 'text-white');
+            btn.classList.add('text-gray-400', 'border-transparent');
+        });
+
+        // Active Nav Style
+        const activeBtn = document.getElementById(`tab-btn-${tabName}`);
+        activeBtn.classList.remove('text-gray-400', 'border-transparent');
+        activeBtn.classList.add('bg-white/5', 'border-white/10', 'text-white', 'border');
+    }
+
+    // --- 2. IMAGE PREVIEW ---
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('profile-preview').src = e.target.result;
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    // --- 3. SERVICES LOGIC (PRE-FILLED) ---
+    // Load Data from Django Context
+    const availableServices = {{ available_services_json|safe }};
+    const currentServices = {{ current_services_json|safe }}; // From View
+    
+    const selectedServices = new Set(currentServices); // Initialize with DB data
+    const unavailableServices = new Set(); // New custom services
+
+    const serviceInput = document.getElementById('service-input');
+    const suggestionsBox = document.getElementById('service-suggestions');
+
+    // Autocomplete
+    serviceInput.addEventListener('input', (e) => {
+        const val = e.target.value.toLowerCase();
+        suggestionsBox.innerHTML = '';
+        if(!val) { suggestionsBox.classList.add('hidden'); return; }
+        const matches = availableServices.filter(s => s.toLowerCase().includes(val) && !selectedServices.has(s));
+        if(matches.length > 0) {
+            suggestionsBox.classList.remove('hidden');
+            matches.forEach(match => {
+                const div = document.createElement('div');
+                div.className = "p-2 hover:bg-white/10 cursor-pointer text-gray-300 text-sm font-mono";
+                div.innerText = match;
+                div.onclick = () => { selectedServices.add(match); renderChips(); serviceInput.value = ''; suggestionsBox.classList.add('hidden'); };
+                suggestionsBox.appendChild(div);
+            });
+        } else { suggestionsBox.classList.add('hidden'); }
+    });
+
+    // Custom Add
+    function addCustomService() {
+        const input = document.getElementById('unavailable-input');
+        const val = input.value.trim();
+        if(val && !unavailableServices.has(val)) { unavailableServices.add(val); input.value = ''; renderChips(); }
+    }
+
+    function renderChips() {
+        const con1 = document.getElementById('services-chips-container');
+        con1.innerHTML = '';
+        selectedServices.forEach(item => {
+            const chip = document.createElement('div');
+            chip.className = "inline-flex items-center px-3 py-1 rounded bg-brand-cyan/10 border border-brand-cyan text-brand-cyan text-xs font-mono";
+            chip.innerHTML = `${item} <button type="button" class="ml-2 hover:text-white" onclick="selectedServices.delete('${item}'); renderChips();"><i class="fa-solid fa-xmark"></i></button>`;
+            con1.appendChild(chip);
+        });
+        document.getElementById('hidden-services-list').value = Array.from(selectedServices).join(',');
+
+        const con2 = document.getElementById('unavailable-chips-container');
+        con2.innerHTML = '';
+        unavailableServices.forEach(item => {
+            const chip = document.createElement('div');
+            chip.className = "inline-flex items-center px-3 py-1 rounded bg-brand-pink/10 border border-brand-pink text-brand-pink text-xs font-mono";
+            chip.innerHTML = `${item} <button type="button" class="ml-2 hover:text-white" onclick="unavailableServices.delete('${item}'); renderChips();"><i class="fa-solid fa-xmark"></i></button>`;
+            con2.appendChild(chip);
+        });
+        document.getElementById('hidden-unavailable-list').value = Array.from(unavailableServices).join(',');
+    }
+
+    // --- 4. SOCIALS LOGIC (PRE-FILLED) ---
+    // Load Data from Django Context
+    let socialLinks = {{ current_socials_json|safe }}; // From View
+
+    function renderSocials() {
+        const container = document.getElementById('socials-list-container');
+        container.innerHTML = '';
+        
+        socialLinks.forEach((link, index) => {
+            const row = document.createElement('div');
+            row.className = "flex items-center gap-3 p-3 bg-black/20 border border-white/5 rounded-lg";
+            row.innerHTML = `
+                <div class="w-8 h-8 rounded bg-white/5 flex items-center justify-center">
+                    <i class="fa-brands fa-${link.platform === 'website' ? 'globe' : link.platform} text-gray-400"></i>
+                </div>
+                <div class="flex-grow overflow-hidden">
+                    <p class="text-[10px] text-gray-500 uppercase font-mono">${link.platform}</p>
+                    <p class="text-sm text-gray-300 font-mono truncate">${link.url}</p>
+                </div>
+                <button type="button" onclick="removeSocial(${index})" class="text-red-500 hover:text-red-400 px-2"><i class="fa-solid fa-trash"></i></button>
+            `;
+            container.appendChild(row);
+        });
+        document.getElementById('hidden-socials-json').value = JSON.stringify(socialLinks);
+    }
+
+    function addSocialLink() {
+        const platformSelect = document.getElementById('new-social-platform');
+        const urlInput = document.getElementById('new-social-url');
+        const url = urlInput.value.trim();
+        
+        if (!url) return;
+        
+        // Remove existing link for same platform if exists (simple logic)
+        socialLinks = socialLinks.filter(l => l.platform !== platformSelect.value);
+        
+        socialLinks.push({
+            platform: platformSelect.value,
+            url: url
+        });
+        
+        urlInput.value = '';
+        renderSocials();
+    }
+
+    function removeSocial(index) {
+        socialLinks.splice(index, 1);
+        renderSocials();
+    }
+
+    // --- INITIALIZE ---
+    renderChips();
+    renderSocials();
+
+</script>
+{% endblock %}

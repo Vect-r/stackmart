@@ -1,14 +1,14 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from apps.master.utils.inputValidators import *
 from apps.master.auth.utils import *
 from apps.users.models import User, UserVerification, SellerProfile, Service, SocialLink
 from django.views.decorators.cache import never_cache
-from django.core.mail import send_mail
-from django.template.loader import render_to_string
-from django.utils.html import strip_tags
-from django.conf import settings
-from django.contrib.sites.shortcuts import get_current_site
+# from django.core.mail import send_mail
+# from django.template.loader import render_to_string
+# from django.utils.html import strip_tags
+# from django.conf import settings
+# from django.contrib.sites.shortcuts import get_current_site
 from datetime import datetime, timedelta, UTC
 from apps.users.forms import PasswordResetForm
 from .mailings import MailSender
@@ -16,9 +16,9 @@ from django.views.decorators.http import require_POST
 from django.http import JsonResponse
 import json
 from django.utils import timezone
-from django.db import transaction
-from django.contrib import messages
-from django.db import IntegrityError
+from django.db import transaction, IntegrityError
+from django.http import Http404
+
 
 
 mailObj = MailSender()
@@ -50,7 +50,8 @@ def login(request):
                 getUser.save()
                 token = generate_token(getUser)
                 
-                if getUser.user_type=="seller" and not getUser.seller_profile:
+                print(hasattr(getUser,'seller_profile'))
+                if getUser.user_type=="seller" and not hasattr(getUser,'seller_profile'):
                     print(True)
                     response = redirect('sellerOnboarding')
                 else:
@@ -195,21 +196,22 @@ def reset_password(request,tokenId):
             getUser.save()
             getVerificationTicket.isVerifiedByUser = True
             getVerificationTicket.save()
-            subject = 'Security Alert: Password Changed'
-            html_message = render_to_string('dashboard/mails/password_reset_success.html', {
-                'user': getUser,
-            })
-            plain_message = strip_tags(html_message)
+        #     subject = 'Security Alert: Password Changed'
+        #     html_message = render_to_string('dashboard/mails/password_reset_success.html', {
+        #         'user': getUser,
+        #     })
+        #     plain_message = strip_tags(html_message)
 
-        # 3. Send the notification
-            send_mail(
-                subject,
-                plain_message,
-                settings.DEFAULT_FROM_EMAIL,
-                [getUser.email],
-                html_message=html_message,
-                fail_silently=True, # Don't crash the user flow if mail fails
-            )
+        # # 3. Send the notification
+        #     send_mail(
+        #         subject,
+        #         plain_message,
+        #         settings.DEFAULT_FROM_EMAIL,
+        #         [getUser.email],
+        #         html_message=html_message,
+        #         fail_silently=True, # Don't crash the user flow if mail fails
+        #     )
+            mailObj.sendPasswordReset(getUser)
             messages.success(request,'Password Reset Successful.')
             return redirect('login')
     return render(request, 'dashboard/reset_password.html', {
@@ -297,6 +299,10 @@ def sellerOnboarding(request):
     context['seller_type']={item[0]:item[1] for item in SellerProfile.SELLER_TYPE_CHOICES}
     context['social_media_platforms']={item[0]:item[1] for item in SocialLink.PLATFORM_CHOICES}
     context['service'] = Service.objects.filter(is_approved=True).all()
+
+    if request.authenticated_user.user_type=="buyer":
+        raise Http404("Page Not Found")
+
     if request.method == "POST":
         entity_type_ = request.POST['entity_type']
         business_name_ = request.POST['business_name']
@@ -356,7 +362,107 @@ def sellerOnboarding(request):
 
 @login_required_jwt
 def sellerProfileView(request):
+    if request.authenticated_user.user_type=="buyer":
+        raise Http404("Page Not Found.")
     return render(request,'dashboard/seller_card.html',{'seller':request.authenticated_user.seller_profile})
+
+@login_required_jwt
+def sellerProfileEdit(request):
+    profile = get_object_or_404(SellerProfile, user=request.authenticated_user)
+
+    if request.method == 'POST':
+        try:
+            with transaction.atomic():
+                # --- A. Update Basic Fields ---
+                profile.business_name = request.POST.get('business_name')
+                profile.address = request.POST.get('address')
+                profile.description = request.POST.get('description')
+                
+                # Handle Image Upload (Only update if a new file is sent)
+                if 'profile_pic' in request.FILES:
+                    profile.profile_pic = request.FILES['profile_pic']
+                
+                profile.save()
+
+                # --- B. Sync Services ---
+                # Get the comma-separated string from the hidden input
+                services_str = request.POST.get('services_list', '')
+                unavailable_str = request.POST.get('unavailable_list', '')
+                
+                # We will collect all valid Service objects here
+                final_services = []
+
+                # 1. Existing Approved Services
+                if services_str:
+                    names = [s.strip() for s in services_str.split(',') if s.strip()]
+                    for name in names:
+                        service_obj = Service.objects.filter(name__iexact=name).first()
+                        if service_obj:
+                            final_services.append(service_obj)
+
+                # 2. Custom/New Services
+                if unavailable_str:
+                    new_names = [s.strip() for s in unavailable_str.split(',') if s.strip()]
+                    for name in new_names:
+                        service_obj, created = Service.objects.get_or_create(
+                            name__iexact=name,
+                            defaults={
+                                'name': name,
+                                'is_approved': False,
+                                'suggested_by': profile
+                            }
+                        )
+                        final_services.append(service_obj)
+                
+                # 3. Apply the sync (this adds new ones and removes unlisted ones)
+                profile.services.set(final_services)
+
+
+                # --- C. Sync Social Links ---
+                socials_json = request.POST.get('socials_json')
+                if socials_json:
+                    # Strategy: Delete old links and recreate new ones (Cleanest for simple lists)
+                    profile.social_links.all().delete()
+                    
+                    socials_data = json.loads(socials_json)
+                    for item in socials_data:
+                        if item.get('platform') and item.get('url'):
+                            SocialLink.objects.create(
+                                seller=profile,
+                                platform=item.get('platform'),
+                                url=item.get('url')
+                            )
+
+            messages.success(request, "Profile updated successfully.")
+            return redirect('sellerProfileView') # Redirect back to the "Business Card" view
+
+        except Exception as e:
+            print(f"Error updating profile: {e}")
+            messages.error(request, "An error occurred while saving changes.")
+
+    # --- GET: PREPARE DATA FOR TEMPLATE ---
+    
+    # 1. Serialize User's Current Services for JS
+    current_services = list(profile.services.values_list('name', flat=True))
+    
+    # 2. Serialize User's Current Socials for JS
+    current_socials = [
+        {'platform': link.platform, 'url': link.url} 
+        for link in profile.social_links.all()
+    ]
+
+    # 3. Get All Approved Services for Autocomplete
+    all_services = Service.objects.filter(is_approved=True).values_list('name', flat=True)
+
+    context = {
+        'seller': profile,
+        'current_services_json': json.dumps(current_services),
+        'current_socials_json': json.dumps(current_socials),
+        'available_services_json': list(all_services),
+        'social_media_platforms': {item[0]: item[1] for item in SocialLink.PLATFORM_CHOICES},
+    }
+    
+    return render(request, 'dashboard/seller_edit.html', context)
 
 def blog(request):
 
