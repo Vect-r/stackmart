@@ -132,7 +132,7 @@
                     </div>
                 </div>
 
-                <div class="group opacity-70">
+                <!-- <div class="group opacity-70">
                     <label class="block text-xs text-gray-500 font-mono mb-1">System Entry Date <span
                             class="text-[10px] text-gray-400">(Read-Only)</span></label>
                     <div
@@ -140,15 +140,16 @@
                         <i class="fa-solid fa-calendar-day text-gray-400 mr-3 text-sm"></i>
                         {{ user.created_at|date:"F j, Y" }}
                     </div>
-                </div>
+                </div> -->
 
             </div>
         </div>
 
         <div class="p-6 border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-[#18181b]">
             <p class="text-xs text-center text-gray-400 font-mono">
-                User ID: <span class="text-gray-600 dark:text-gray-500">{{ user.pk }}</span> • Last Login: <span
-                    class="text-gray-600 dark:text-gray-500">{{ user.last_login|timesince }} ago</span>
+                User ID: <span class="text-gray-600 dark:text-gray-500">{{ user.pk }}</span> 
+                • Last Login: <span class="text-gray-600 dark:text-gray-500">{{ user.last_login|timesince }} ago</span><br>
+                • Member Since: <span class="text-gray-600 dark:text-gray-500">{{ user.created_at }}</span>
             </p>
         </div>
 

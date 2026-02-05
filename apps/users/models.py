@@ -15,6 +15,11 @@ def profile_upload_path(instance, filename):
     filename = f"user_{instance.id}.{ext}"
     return os.path.join("user-profiles", filename)
 
+def bizz_profile_upload_path(instance, filename):
+    ext = filename.split('.')[-1]
+    filename = f"user_{instance.user.id}.{ext}"
+    return os.path.join("bizz-profiles", filename)
+
 class User(BaseClass):
     USER_TYPE_CHOICES = (
         ("buyer", "Buyer"),
@@ -28,6 +33,7 @@ class User(BaseClass):
     pancard = models.FileField(upload_to=pancard_upload_path, null=False, blank=False)
     password = models.CharField(max_length=255, null=False, blank=False)
     is_active = models.BooleanField(default=False)
+    is_mail_verified = models.BooleanField(default=False)
     last_login = models.DateTimeField(null=True, blank=True)
 
     def remove_profile_picture(self):
@@ -35,6 +41,105 @@ class User(BaseClass):
             self.profile.delete(save=False)
         self.profile = "defaults/user-avatar.svg"
         self.save()
+
+
+class Service(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    description = models.TextField(blank=True)
+    
+    # Approval System
+    is_approved = models.BooleanField(default=False, help_text="Only admin approved services are visible to all.")
+    
+    # Optional: Track who suggested it (so you can notify them when approved)
+    suggested_by = models.ForeignKey(
+        'SellerProfile', 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True,
+        related_name='suggested_services'
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
+
+class SellerProfile(BaseClass):
+    SELLER_TYPE_CHOICES = (
+        ('individual', 'Individual'),
+        ('business', 'Business'),
+    )
+
+    # Link to your existing User model (One Profile per User)
+    user = models.OneToOneField(
+        User, 
+        on_delete=models.CASCADE, 
+        related_name='seller_profile'
+    )
+    
+    seller_type = models.CharField(
+        max_length=20, 
+        choices=SELLER_TYPE_CHOICES, 
+        default='individual'
+    )
+
+    # Basic Info
+    business_name = models.CharField(max_length=255, help_text="Brand name or Company name")
+    profile_pic = models.ImageField(upload_to=bizz_profile_upload_path, blank=True, null=True)
+    description = models.TextField(blank=True)
+    
+    # Address (Simple text for now, or you can make a separate Address model later)
+    address = models.TextField()
+    
+    # Verification/Business Specifics
+    is_verified = models.BooleanField(default=False)
+    
+    services = models.ManyToManyField(
+        Service, 
+        related_name='sellers',  # This key allows the reverse lookup!
+        blank=True
+    )
+
+    def __str__(self):
+        return f"{self.business_name} ({self.user.username})"
+    
+
+    def remove_profile_picture(self):
+        if self.profile_pic and self.profile_pic.name != "defaults/user-avatar.svg":
+            self.profile_pic.delete(save=False)
+        self.profile_pic = "defaults/user-avatar.svg"
+        self.save()
+    
+    
+
+class SocialLink(models.Model):
+    PLATFORM_CHOICES = (
+        ('linkedin', 'LinkedIn'),
+        ('github', 'GitHub'),
+        ('twitter', 'X (Twitter)'),
+        ('facebook', 'Facebook'),
+        ('instagram', 'Instagram'),
+        ('website', 'Personal Website'),
+    )
+
+    # Link to the Seller Profile
+    seller = models.ForeignKey(
+        SellerProfile, 
+        on_delete=models.CASCADE, 
+        related_name='social_links' # This allows access via seller.social_links.all()
+    )
+    
+    platform = models.CharField(max_length=20, choices=PLATFORM_CHOICES)
+    url = models.URLField(help_text="Full URL (e.g., https://github.com/username)")
+    
+    # Optional: To control the order they appear on the profile
+    display_order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ['display_order']
+
+    def __str__(self):
+        return f"{self.get_platform_display()} - {self.seller.business_name}"
 
 class UserVerification(BaseClass):
     # VERIFICATION_CHOICE = (

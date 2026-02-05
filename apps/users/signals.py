@@ -19,3 +19,4 @@ def delete_old_pancard(sender, instance, **kwargs):
     if old_file and old_file != new_file:
         if os.path.isfile(old_file.path):
             os.remove(old_file.path)
+            

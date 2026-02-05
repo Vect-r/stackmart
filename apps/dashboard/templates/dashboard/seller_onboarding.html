@@ -1,0 +1,488 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Seller Registration | Stackmart{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-start justify-center p-4 md:p-8 pt-16 md:pt-24">
+    
+    <div class="w-full max-w-6xl bg-[#18181b]/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 overflow-hidden flex flex-col md:flex-row min-h-[600px] bg-transparent">
+        
+        <div class="w-full md:w-1/3 lg:w-1/4 bg-black/20 border-b md:border-b-0 md:border-r border-white/10 p-8 flex flex-col relative">
+            
+            <div class="mb-10 hidden md:block">
+                <h2 class="text-xl font-bold font-mono text-white tracking-tighter">
+                    Seller_<span class="text-brand-cyan">Setup</span>()
+                </h2>
+                
+                <p class="text-sm text-gray-300 font-mono mt-4">
+                    Welcome, <span class="text-brand-purple font-bold">{{ request.authenticated_user.username }}</span>
+                </p>
+                
+                <p class="text-xs text-gray-500 font-mono mt-1">Complete these steps to activate your merchant account.</p>
+            </div>
+
+            <div class="relative flex-grow">
+                <div class="absolute left-4 top-2 bottom-10 w-0.5 bg-white/10 hidden md:block"></div>
+                
+                <div class="space-y-10 relative">
+                    <div class="step-indicator flex items-start gap-4 group" data-step="1">
+                        <div class="relative z-10 flex items-center justify-center w-8 h-8 rounded-full border-2 border-brand-cyan bg-brand-cyan/20 text-brand-cyan font-bold text-sm shadow-[0_0_10px_rgba(0,223,216,0.3)] transition-all duration-300">1</div>
+                        <div class="pt-1">
+                            <h4 class="text-sm font-bold text-white font-mono group-hover:text-brand-cyan transition-colors">Entity Type</h4>
+                            <p class="text-[10px] text-gray-500 font-mono hidden md:block">Business vs Individual</p>
+                        </div>
+                    </div>
+                    <div class="step-indicator flex items-start gap-4 group opacity-50" data-step="2">
+                        <div class="relative z-10 flex items-center justify-center w-8 h-8 rounded-full border-2 border-gray-600 bg-[#18181b] text-gray-400 font-bold text-sm transition-all duration-300">2</div>
+                        <div class="pt-1">
+                            <h4 class="text-sm font-bold text-gray-400 font-mono group-hover:text-gray-300 transition-colors">Basic Info</h4>
+                            <p class="text-[10px] text-gray-600 font-mono hidden md:block">Profile & Location</p>
+                        </div>
+                    </div>
+                    <div class="step-indicator flex items-start gap-4 group opacity-50" data-step="3">
+                        <div class="relative z-10 flex items-center justify-center w-8 h-8 rounded-full border-2 border-gray-600 bg-[#18181b] text-gray-400 font-bold text-sm transition-all duration-300">3</div>
+                        <div class="pt-1">
+                            <h4 class="text-sm font-bold text-gray-400 font-mono group-hover:text-gray-300 transition-colors">Services</h4>
+                            <p class="text-[10px] text-gray-600 font-mono hidden md:block">What you offer</p>
+                        </div>
+                    </div>
+                    <div class="step-indicator flex items-start gap-4 group opacity-50" data-step="4">
+                        <div class="relative z-10 flex items-center justify-center w-8 h-8 rounded-full border-2 border-gray-600 bg-[#18181b] text-gray-400 font-bold text-sm transition-all duration-300">4</div>
+                        <div class="pt-1">
+                            <h4 class="text-sm font-bold text-gray-400 font-mono group-hover:text-gray-300 transition-colors">Socials</h4>
+                            <p class="text-[10px] text-gray-600 font-mono hidden md:block">Online Presence</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="md:hidden w-full bg-gray-800 h-1 mt-4 rounded-full overflow-hidden">
+                <div id="mobile-progress-bar" class="h-full bg-brand-cyan w-1/4 transition-all duration-300"></div>
+            </div>
+        </div>
+
+        <div class="w-full md:w-2/3 lg:w-3/4 p-8 md:p-12 relative flex flex-col">
+            
+            <form method="POST" id="onboarding-form" enctype="multipart/form-data" class="flex-grow flex flex-col h-full">
+                {% csrf_token %}
+                
+                <div class="flex-grow relative">
+                    
+                    <div class="step-content w-full h-full flex flex-col" data-step="1">
+                        <div class="mb-8">
+                            <h2 class="text-2xl md:text-3xl font-bold text-white font-mono mb-2">Select Business Type</h2>
+                            <p class="text-gray-400 font-mono text-sm">Choose the structure that best describes your operation.</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl">
+                            {% for key, label in seller_type.items %}
+                            <label class="relative cursor-pointer group h-full">
+                                <input type="radio" name="entity_type" value="{{ key }}" class="peer sr-only" {% if forloop.first %}checked{% endif %}>
+                                <div class="h-64 p-8 rounded-2xl border-2 border-white/10 bg-white/5 hover:bg-white/10 hover:border-gray-500 peer-checked:border-brand-cyan peer-checked:bg-brand-cyan/10 peer-checked:shadow-[0_0_20px_rgba(0,223,216,0.15)] transition-all duration-300 flex flex-col items-center justify-center text-center gap-6">
+                                    <div class="w-20 h-20 rounded-full bg-black/40 border border-white/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 peer-checked:border-brand-cyan peer-checked:text-brand-cyan">
+                                        {% if key == 'business' %}
+                                            <i class="fa-solid fa-building text-3xl text-gray-400 peer-checked:text-brand-cyan"></i>
+                                        {% else %}
+                                            <i class="fa-solid fa-user text-3xl text-gray-400 peer-checked:text-brand-cyan"></i>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <h3 class="text-lg font-bold text-white font-mono mb-2">{{ label }}</h3>
+                                        <p class="text-xs text-gray-500 font-mono">
+                                            {% if key == 'business' %}For registered companies.{% else %}For freelancers.{% endif %}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="absolute top-4 right-4 opacity-0 peer-checked:opacity-100 transition-opacity duration-300">
+                                    <i class="fa-solid fa-circle-check text-brand-cyan text-xl"></i>
+                                </div>
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="step-content hidden w-full h-full flex-col" data-step="2">
+                        <div class="mb-8">
+                            <h2 class="text-2xl font-bold text-white font-mono mb-2">Business Profile</h2>
+                            <p class="text-gray-400 font-mono text-sm">Set your brand identity.</p>
+                        </div>
+                        
+                        <div class="space-y-8 max-w-2xl">
+                            
+                            <div class="flex flex-col items-center md:items-start gap-4">
+                                <label class="block text-sm font-mono text-gray-400">Business Logo / Avatar</label>
+                                <div class="relative group">
+                                    <img id="profile-preview" 
+                                         src="{% static 'images/default_avatar.svg' %}" 
+                                         alt="Profile Preview" 
+                                         class="w-28 h-28 rounded-full object-cover border-4 border-[#1f1f23] ring-2 ring-brand-purple shadow-[0_0_15px_rgba(121,40,202,0.5)] transition-all">
+                                    
+                                    <label for="profile-upload" class="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center cursor-pointer transition-opacity duration-300">
+                                        <i class="fa-solid fa-camera text-white text-xl"></i>
+                                    </label>
+                                    
+                                    <input type="file" id="profile-upload" name="profile_pic" accept="image/*" class="hidden" onchange="previewProfileImage(this)">
+                                </div>
+                                <p class="text-xs text-gray-500 font-mono">Recommended: 400x400px</p>
+                            </div>
+
+                            <div class="space-y-6">
+                                <div>
+                                    <label class="block text-sm font-mono text-gray-400 mb-2">Display Name</label>
+                                    <input type="text" name="business_name" class="w-full bg-black/30 border border-white/10 rounded-xl p-4 text-white focus:border-brand-purple focus:ring-1 focus:ring-brand-purple outline-none transition-all font-mono placeholder-gray-600" placeholder="e.g. Nexus Hardware" required>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-mono text-gray-400 mb-2">Full Address</label>
+                                    <textarea name="address" rows="3" class="w-full bg-black/30 border border-white/10 rounded-xl p-4 text-white focus:border-brand-purple focus:ring-1 focus:ring-brand-purple outline-none transition-all font-mono placeholder-gray-600" placeholder="Street, City, Zip Code..." required></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- <div class="step-content hidden w-full h-full flex-col" data-step="3">
+                        <div class="mb-8">
+                            <h2 class="text-2xl font-bold text-white font-mono mb-2">Services Offered</h2>
+                            <p class="text-gray-400 font-mono text-sm">Add tags for skills you provide.</p>
+                        </div>
+
+                        <div class="max-w-2xl space-y-8">
+                            <div>
+                                <label class="block text-sm font-mono text-gray-400 mb-2">Search Services</label>
+                                <div class="relative">
+                                    <input type="text" id="service-input" class="w-full bg-black/30 border border-white/10 rounded-xl p-4 pl-12 text-white focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan outline-none transition-all font-mono placeholder-gray-600" placeholder="Type to search...">
+                                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 text-lg"></i>
+                                    
+                                    <div id="service-suggestions" class="hidden absolute z-10 w-full bg-[#1f1f23] border border-white/10 rounded-xl mt-2 max-h-48 overflow-y-auto shadow-2xl"></div>
+                                </div>
+                                <div id="services-chips-container" class="flex flex-wrap gap-2 mt-4 min-h-[40px]"></div>
+                                <input type="hidden" name="services_list" id="hidden-services-list">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-mono text-gray-400 mb-2">Can't find it? Add Custom</label>
+                                <div class="flex gap-2">
+                                    <input type="text" id="unavailable-input" class="flex-grow bg-black/30 border border-white/10 rounded-xl p-4 text-white focus:border-brand-pink focus:ring-1 focus:ring-brand-pink outline-none transition-all font-mono placeholder-gray-600" placeholder="Custom service name...">
+                                    <button type="button" id="btn-add-custom" class="bg-white/5 hover:bg-white/10 text-white px-6 rounded-xl font-mono border border-white/10">Add</button>
+                                </div>
+                                <div id="unavailable-chips-container" class="flex flex-wrap gap-2 mt-4"></div>
+                                <input type="hidden" name="unavailable_list" id="hidden-unavailable-list">
+                            </div>
+                        </div>
+                    </div> -->
+                    <div class="step-content hidden w-full h-full flex-col" data-step="3">
+                        <div class="mb-8">
+                            <h2 class="text-2xl font-bold text-white font-mono mb-2">Expertise & Services</h2>
+                            <p class="text-gray-400 font-mono text-sm">Describe what you do and select your skills.</p>
+                        </div>
+
+                        <div class="max-w-2xl space-y-8">
+                            
+                            <div>
+                                <label class="block text-sm font-mono text-gray-400 mb-2">Company Overview</label>
+                                <textarea name="description" rows="4" class="w-full bg-black/30 border border-white/10 rounded-xl p-4 text-white focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan outline-none transition-all font-mono placeholder-gray-600" placeholder="Briefly describe your company's mission, expertise, and what makes your services unique..."></textarea>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-mono text-gray-400 mb-2">Search Services</label>
+                                <div class="relative">
+                                    <input type="text" id="service-input" class="w-full bg-black/30 border border-white/10 rounded-xl p-4 pl-12 text-white focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan outline-none transition-all font-mono placeholder-gray-600" placeholder="Type to search (e.g. Web Dev)...">
+                                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 text-lg"></i>
+                                    <div id="service-suggestions" class="hidden absolute z-10 w-full bg-[#1f1f23] border border-white/10 rounded-xl mt-2 max-h-48 overflow-y-auto shadow-2xl"></div>
+                                </div>
+                                <div id="services-chips-container" class="flex flex-wrap gap-2 mt-4 min-h-[40px]"></div>
+                                <input type="hidden" name="services_list" id="hidden-services-list">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-mono text-gray-400 mb-2">Can't find it? Add Custom</label>
+                                
+                                <div class="mb-3 p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20 flex items-start gap-3">
+                                    <i class="fa-solid fa-triangle-exclamation text-yellow-500 mt-0.5 text-sm"></i>
+                                    <p class="text-xs font-mono text-yellow-200/70">
+                                        <span class="font-bold text-yellow-500">Approval Required:</span> 
+                                        Custom services will be reviewed by an admin before they appear publicly on your profile.
+                                    </p>
+                                </div>
+
+                                <div class="flex gap-2">
+                                    <input type="text" id="unavailable-input" class="flex-grow bg-black/30 border border-white/10 rounded-xl p-4 text-white focus:border-brand-pink focus:ring-1 focus:ring-brand-pink outline-none transition-all font-mono placeholder-gray-600" placeholder="Custom service name...">
+                                    <button type="button" id="btn-add-custom" class="bg-white/5 hover:bg-white/10 text-white px-6 rounded-xl font-mono border border-white/10">Add</button>
+                                </div>
+                                <div id="unavailable-chips-container" class="flex flex-wrap gap-2 mt-4"></div>
+                                <input type="hidden" name="unavailable_list" id="hidden-unavailable-list">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step-content hidden w-full h-full flex-col" data-step="4">
+                        <div class="mb-8">
+                            <h2 class="text-2xl font-bold text-white font-mono mb-2">Connect Accounts</h2>
+                            <p class="text-gray-400 font-mono text-sm">Where can customers find you?</p>
+                        </div>
+
+                        <div class="max-w-2xl">
+                            <div id="socials-list-container" class="space-y-4 mb-6">
+                                <div id="socials-empty-state" class="text-center py-12 border-2 border-dashed border-white/10 rounded-xl bg-black/20">
+                                    <i class="fa-solid fa-share-nodes text-3xl text-gray-600 mb-4"></i>
+                                    <p class="text-gray-500 font-mono text-sm">No accounts connected.</p>
+                                </div>
+                            </div>
+
+                            <button type="button" onclick="openSocialModal()" class="w-full py-4 border-2 border-[#27272a] text-brand-purple hover:border-brand-purple/50 hover:bg-brand-purple/10 rounded-xl font-bold font-mono transition-all duration-300 flex items-center justify-center gap-3 group">
+                                <i class="fa-solid fa-plus group-hover:scale-110 transition-transform"></i> 
+                                Add Social Handle
+                            </button>
+                            <input type="hidden" name="socials_json" id="hidden-socials-json">
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="mt-auto pt-10 flex justify-between items-center border-t border-white/10">
+                    <button type="button" id="prev-btn" class="hidden px-6 py-3 text-gray-400 hover:text-white font-mono flex items-center gap-2 transition-colors">
+                        <i class="fa-solid fa-arrow-left"></i> Back
+                    </button>
+                    
+                    <button type="button" id="next-btn" class="ml-auto px-10 py-3 bg-white text-black font-bold rounded-lg hover:bg-gray-200 transition-colors font-mono shadow-[0_0_15px_rgba(255,255,255,0.1)]">
+                        Next Step
+                    </button>
+
+                    <button type="submit" id="submit-btn" class="hidden ml-auto px-10 py-3 bg-gradient-to-r from-brand-cyan to-brand-purple text-white font-bold rounded-lg hover:brightness-110 transition-all font-mono shadow-[0_0_20px_rgba(0,223,216,0.3)]">
+                        Complete Setup
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="social-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm">
+    <div class="bg-[#18181b] border border-white/10 rounded-2xl w-full max-w-md p-8 shadow-2xl transform scale-100 transition-all">
+        <h3 class="text-xl font-bold text-white mb-6 font-mono">Add Social Link</h3>
+        <div class="space-y-4">
+            <div>
+                <label class="block text-xs text-gray-400 font-mono mb-2">Platform</label>
+                <select id="modal-platform-select" class="w-full bg-black/30 border border-white/10 rounded-lg p-3 text-white outline-none font-mono">
+                    {% for key, label in social_media_platforms.items %}
+                        <option value="{{ key }}">{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs text-gray-400 font-mono mb-2">URL</label>
+                <input type="url" id="modal-url-input" class="w-full bg-black/30 border border-white/10 rounded-lg p-3 text-white outline-none font-mono placeholder-gray-600" placeholder="https://...">
+            </div>
+        </div>
+        <div class="flex justify-end gap-4 mt-8">
+            <button type="button" onclick="closeSocialModal()" class="text-gray-400 hover:text-white font-mono">Cancel</button>
+            <button type="button" onclick="addSocialLinkFromModal()" class="px-6 py-2 bg-brand-cyan text-black font-bold rounded-lg font-mono">Add</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- PROFILE IMAGE PREVIEW ---
+    function previewProfileImage(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('profile-preview').src = e.target.result;
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    // --- WIZARD DATA ---
+    const availableServices = [
+        {% for s in service %} "{{ s.name|escapejs }}", {% endfor %}
+    ];
+
+    let currentStep = 1;
+    const totalSteps = 4;
+
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const submitBtn = document.getElementById('submit-btn');
+
+    function updateUI() {
+        // Indicators
+        document.querySelectorAll('.step-indicator').forEach(el => {
+            const step = parseInt(el.getAttribute('data-step'));
+            const circle = el.querySelector('div:first-child');
+            const text = el.querySelector('h4');
+            
+            if (step === currentStep) {
+                el.classList.remove('opacity-50');
+                circle.className = "relative z-10 flex items-center justify-center w-8 h-8 rounded-full border-2 border-brand-cyan bg-brand-cyan/20 text-brand-cyan font-bold text-sm shadow-[0_0_10px_rgba(0,223,216,0.3)] transition-all duration-300";
+                text.className = "text-sm font-bold text-white font-mono transition-colors";
+            } else if (step < currentStep) {
+                el.classList.remove('opacity-50');
+                circle.className = "relative z-10 flex items-center justify-center w-8 h-8 rounded-full border-2 border-green-500 bg-green-500/10 text-green-500 font-bold text-sm transition-all duration-300";
+                circle.innerHTML = '<i class="fa-solid fa-check"></i>';
+                text.className = "text-sm font-bold text-white font-mono";
+            } else {
+                el.classList.add('opacity-50');
+                circle.className = "relative z-10 flex items-center justify-center w-8 h-8 rounded-full border-2 border-gray-600 bg-[#18181b] text-gray-400 font-bold text-sm transition-all duration-300";
+                circle.innerHTML = step;
+                text.className = "text-sm font-bold text-gray-400 font-mono";
+            }
+        });
+
+        // Mobile Bar
+        const mobileBar = document.getElementById('mobile-progress-bar');
+        if(mobileBar) mobileBar.style.width = ((currentStep / totalSteps) * 100) + '%';
+
+        // Content
+        document.querySelectorAll('.step-content').forEach(el => {
+            if (parseInt(el.getAttribute('data-step')) === currentStep) {
+                el.classList.remove('hidden');
+                el.classList.add('flex');
+                el.animate([{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: 300, fill: 'forwards' });
+            } else {
+                el.classList.add('hidden');
+                el.classList.remove('flex');
+            }
+        });
+
+        // Buttons
+        prevBtn.classList.toggle('hidden', currentStep === 1);
+        
+        if (currentStep === totalSteps) {
+            nextBtn.classList.add('hidden');
+            submitBtn.classList.remove('hidden');
+        } else {
+            nextBtn.classList.remove('hidden');
+            submitBtn.classList.add('hidden');
+        }
+    }
+
+    // Nav Events
+    nextBtn.addEventListener('click', () => {
+        if (currentStep === 2) {
+            const name = document.querySelector('input[name="business_name"]').value;
+            const addr = document.querySelector('textarea[name="address"]').value;
+            if(!name || !addr) { alert('Please fill in required fields.'); return; }
+        }
+
+        if (currentStep === 3) {
+            const desc = document.querySelector('textarea[name="description"]').value.trim();
+            
+            if (!desc) {
+                alert('Please provide a Company Overview.');
+                return;
+            }
+        }
+
+        if (currentStep < totalSteps) { currentStep++; updateUI(); }
+    });
+
+    prevBtn.addEventListener('click', () => {
+        if (currentStep > 1) { currentStep--; updateUI(); }
+    });
+
+    // --- SERVICES ---
+    const selectedServices = new Set();
+    const unavailableServices = new Set();
+    const serviceInput = document.getElementById('service-input');
+    const suggestionsBox = document.getElementById('service-suggestions');
+
+    serviceInput.addEventListener('input', (e) => {
+        const val = e.target.value.toLowerCase();
+        suggestionsBox.innerHTML = '';
+        if(!val) { suggestionsBox.classList.add('hidden'); return; }
+        const matches = availableServices.filter(s => s.toLowerCase().includes(val) && !selectedServices.has(s));
+        if(matches.length > 0) {
+            suggestionsBox.classList.remove('hidden');
+            matches.forEach(match => {
+                const div = document.createElement('div');
+                div.className = "p-3 hover:bg-[#27272a] text-gray-300 cursor-pointer text-sm font-mono border-b border-[#27272a] last:border-0";
+                div.innerText = match;
+                div.onclick = () => { selectedServices.add(match); renderChips(); serviceInput.value = ''; suggestionsBox.classList.add('hidden'); };
+                suggestionsBox.appendChild(div);
+            });
+        } else { suggestionsBox.classList.add('hidden'); }
+    });
+
+    document.getElementById('btn-add-custom').onclick = () => {
+        const input = document.getElementById('unavailable-input');
+        const val = input.value.trim();
+        if(val && !unavailableServices.has(val)) { unavailableServices.add(val); input.value = ''; renderChips(); }
+    };
+
+    function renderChips() {
+        const con1 = document.getElementById('services-chips-container');
+        con1.innerHTML = '';
+        selectedServices.forEach(item => {
+            const chip = document.createElement('div');
+            chip.className = "inline-flex items-center px-3 py-1 rounded-lg text-xs font-bold bg-brand-cyan/10 border border-brand-cyan text-brand-cyan font-mono";
+            chip.innerHTML = `${item} <button type="button" class="ml-2 hover:text-white" onclick="removeService('${item}')"><i class="fa-solid fa-xmark"></i></button>`;
+            con1.appendChild(chip);
+        });
+        document.getElementById('hidden-services-list').value = Array.from(selectedServices).join(',');
+
+        const con2 = document.getElementById('unavailable-chips-container');
+        con2.innerHTML = '';
+        unavailableServices.forEach(item => {
+            const chip = document.createElement('div');
+            chip.className = "inline-flex items-center px-3 py-1 rounded-lg text-xs font-bold bg-brand-pink/10 border border-brand-pink text-brand-pink font-mono";
+            chip.innerHTML = `${item} <button type="button" class="ml-2 hover:text-white" onclick="removeUnavailable('${item}')"><i class="fa-solid fa-xmark"></i></button>`;
+            con2.appendChild(chip);
+        });
+        document.getElementById('hidden-unavailable-list').value = Array.from(unavailableServices).join(',');
+    }
+
+    window.removeService = (item) => { selectedServices.delete(item); renderChips(); };
+    window.removeUnavailable = (item) => { unavailableServices.delete(item); renderChips(); };
+
+    // --- SOCIALS ---
+    let socialLinks = [];
+    const socialModal = document.getElementById('social-modal');
+    const platformSelect = document.getElementById('modal-platform-select');
+    const urlInput = document.getElementById('modal-url-input');
+
+    window.openSocialModal = () => { socialModal.classList.remove('hidden'); urlInput.focus(); };
+    window.closeSocialModal = () => { socialModal.classList.add('hidden'); urlInput.value = ''; };
+    
+    window.addSocialLinkFromModal = () => {
+        const platform = platformSelect.value;
+        const url = urlInput.value.trim();
+        if(!url) return;
+        socialLinks.push({platform, url});
+        renderSocialList();
+        closeSocialModal();
+    };
+
+    window.removeSocialLink = (index) => { socialLinks.splice(index, 1); renderSocialList(); };
+
+    function renderSocialList() {
+        const container = document.getElementById('socials-list-container');
+        const emptyState = document.getElementById('socials-empty-state');
+        
+        Array.from(container.children).forEach(child => { if(child.id !== 'socials-empty-state') child.remove(); });
+        emptyState.style.display = socialLinks.length === 0 ? 'block' : 'none';
+
+        socialLinks.forEach((link, index) => {
+            const div = document.createElement('div');
+            div.className = "flex items-center justify-between p-4 bg-black/30 border border-white/10 rounded-xl";
+            div.innerHTML = `
+                <div class="flex items-center gap-4 overflow-hidden">
+                    <div class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center flex-shrink-0">
+                        <i class="fa-brands fa-${link.platform === 'website' ? 'globe' : link.platform} text-gray-400"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-xs text-gray-500 uppercase font-mono">${link.platform}</p>
+                        <p class="text-sm text-white font-mono truncate">${link.url}</p>
+                    </div>
+                </div>
+                <button type="button" onclick="removeSocialLink(${index})" class="text-red-500 hover:text-red-400 px-2"><i class="fa-solid fa-trash"></i></button>
+            `;
+            container.appendChild(div);
+        });
+        document.getElementById('hidden-socials-json').value = JSON.stringify(socialLinks);
+    }
+
+    updateUI();
+</script>
+{% endblock %}

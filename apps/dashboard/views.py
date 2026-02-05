@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from apps.master.utils.inputValidators import *
 from apps.master.auth.utils import *
-from apps.users.models import User, UserVerification
+from apps.users.models import User, UserVerification, SellerProfile, Service, SocialLink
 from django.views.decorators.cache import never_cache
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
@@ -16,6 +16,10 @@ from django.views.decorators.http import require_POST
 from django.http import JsonResponse
 import json
 from django.utils import timezone
+from django.db import transaction
+from django.contrib import messages
+from django.db import IntegrityError
+
 
 mailObj = MailSender()
 
@@ -46,7 +50,12 @@ def login(request):
                 getUser.save()
                 token = generate_token(getUser)
                 
-                response = redirect('dashboard')
+                if getUser.user_type=="seller" and not getUser.seller_profile:
+                    print(True)
+                    response = redirect('sellerOnboarding')
+                else:
+                    print(False)
+                    response = redirect('dashboard')
                 # Securely set the cookie
                 # response.set_cookie('access_token', token, httponly=True)
                 request.session['access_token'] = token
@@ -282,6 +291,72 @@ def profileUpdate(request):
         'new_avatar_url': user.profile.url
     })
 
+@login_required_jwt
+def sellerOnboarding(request):
+    context={}
+    context['seller_type']={item[0]:item[1] for item in SellerProfile.SELLER_TYPE_CHOICES}
+    context['social_media_platforms']={item[0]:item[1] for item in SocialLink.PLATFORM_CHOICES}
+    context['service'] = Service.objects.filter(is_approved=True).all()
+    if request.method == "POST":
+        entity_type_ = request.POST['entity_type']
+        business_name_ = request.POST['business_name']
+        address_ = request.POST['address']
+        description_ = request.POST['description']
+        services_list_ = request.POST['services_list']
+        unavailable_list_ = request.POST['unavailable_list']
+        socials_json_= request.POST['socials_json']
+
+        user = request.authenticated_user
+
+
+        #At First, We will add all the required fields.
+        seller = SellerProfile(user=user,
+                               seller_type=entity_type_,
+                               business_name=business_name_,
+                               description=description_,
+                               address=address_)
+        
+        
+        if 'profile_pic' in request.FILES:
+            seller.profile_pic = request.FILES['profile_pic']
+
+        seller.save()
+
+        if services_list_:
+            services_list_ = services_list_.split(',')
+            # print(services_list_)
+            objs = Service.objects.filter(name__in = services_list_,is_approved=True)
+            print(objs)
+            seller.services.add(*objs)
+
+        if unavailable_list_:
+            unavailable_list_ = unavailable_list_.split(',')
+            serviceUnObjs=[]
+            for i in unavailable_list_:
+                try:
+                    serviceUnObjs.append(Service.objects.create(name=i,suggested_by=seller))
+                except IntegrityError:
+                    pass
+            seller.services.add(*serviceUnObjs)
+
+        if socials_json_:
+            socials_json_ = json.loads(socials_json_)
+            # [{"platform":"linkedin","url":"https://google.com"}]
+
+            for handle in socials_json_:
+                SocialLink.objects.create(seller=seller,platform = handle['platform'],url = handle['url'])
+            
+        # seller.save()
+        messages.success(request,"Business Profile Created.")
+        return redirect('dashboard')
+        print(entity_type_,business_name_,address_,description_,services_list_,unavailable_list_,socials_json_)
+
+
+    return render(request, 'dashboard/seller_onboarding.html',context)
+
+@login_required_jwt
+def sellerProfileView(request):
+    return render(request,'dashboard/seller_card.html',{'seller':request.authenticated_user.seller_profile})
 
 def blog(request):
 

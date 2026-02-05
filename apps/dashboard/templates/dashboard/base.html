@@ -168,10 +168,19 @@
                                 <p class="text-xs text-gray-500 font-mono">Signed in as</p>
                                 <p class="text-sm font-bold text-gray-900 dark:text-white font-mono truncate">{{  request.authenticated_user.username }}</p>
                             </div>
+                            
 
+                            {% if request.authenticated_user.seller_profile %}
+                            <a href="{%url 'sellerProfileView'%}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-brand-purple transition-colors font-mono">
+                                <i class="fa-solid fa-user mr-2 text-xs"></i> Seller Profile
+                            </a>
+                            
+                            {%endif%}
+                            
                             <a href="{%url 'profile'%}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-brand-purple transition-colors font-mono">
                                 <i class="fa-solid fa-user mr-2 text-xs"></i> Profile
                             </a>
+                            
                             <a href="{% url 'logout' %}" class="block px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors font-mono">
                                 <i class="fa-solid fa-arrow-right-from-bracket mr-2 text-xs"></i> Logout
                             </a>
