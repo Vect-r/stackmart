@@ -300,7 +300,7 @@ def sellerOnboarding(request):
     context['social_media_platforms']={item[0]:item[1] for item in SocialLink.PLATFORM_CHOICES}
     context['service'] = Service.objects.filter(is_approved=True).all()
 
-    if request.authenticated_user.user_type=="buyer":
+    if request.authenticated_user.user_type=="buyer" or hasattr(request.authenticated_user,'seller_profile'):
         raise Http404("Page Not Found")
 
     if request.method == "POST":
