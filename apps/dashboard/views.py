@@ -17,6 +17,7 @@ from django.http import JsonResponse
 import json
 from django.utils import timezone
 from django.db import transaction, IntegrityError
+from apps.users.services import getExistingRequest
 from django.http import Http404
 
 
@@ -366,6 +367,34 @@ def sellerProfileView(request):
         raise Http404("Page Not Found.")
     return render(request,'dashboard/seller_card.html',{'seller':request.authenticated_user.seller_profile})
 
+def sellerProfilePublicView(request,seller_id):
+    getSellerProfile = get_object_or_404(SellerProfile,id = seller_id)
+    connection_status = None
+
+    #At first we will check if user is authenicated or not.
+    if request.isAuthenticated:
+        #if user is not same
+        if getSellerProfile.user.id != request.authenticated_user.id:
+            existing_request = getExistingRequest(request.authenticated_user,getSellerProfile.user)
+            if existing_request:
+                connection_status = existing_request.status
+                # If the viewer sent it and it's pending
+                if existing_request.sender == request.authenticated_user and existing_request.status == 'pending':
+                     connection_status = 'sent_pending'
+
+    # print(request.isAuthenticated)
+
+    context = {
+        'seller': getSellerProfile,
+        'is_guest': None,
+        'is_own_profile': None,
+        'connection_status': connection_status, # 'sent_pending', 'accepted', or None
+        # We pass the current URL path so login can redirect back here
+        'next_url': request.path 
+    }
+    
+    return render(request, 'dashboard/public_seller_profile.html', context)
+
 @login_required_jwt
 def sellerProfileEdit(request):
     profile = get_object_or_404(SellerProfile, user=request.authenticated_user)
@@ -467,3 +496,4 @@ def sellerProfileEdit(request):
 def blog(request):
 
     return render(request, "dashboard/blog.html")
+

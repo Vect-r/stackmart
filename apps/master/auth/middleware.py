@@ -19,18 +19,22 @@ class JWTAuthMiddleware:
 
                 #this is very long
 
-                # try:
-                #     # 3. Attach user if token is valid
-                #     request.authenticated_user = User.objects.get(id=payload['user_id'])
-                #     request.isAuthenticated = User.objects.filter(id=payload['user_id']).exists()
-                # except User.DoesNotExist:
-                #     # Token valid but user deleted? Clear session.
-                #     request.session.flush()
+                try:
+                    # 3. Attach user if token is valid
+                    request.authenticated_user = User.objects.get(id=payload['user_id'])
+                    # request.isAuthenticated = User.objects.filter(id=payload['user_id']).exists()
+                    request.isAuthenticated = True
+                except User.DoesNotExist:
+                    # Token valid but user deleted? Clear session.
+                    request.isAuthenticated = False
+                    request.session.flush()
 
                 #this is short
-                request.isAuthenticated = User.objects.filter(id=payload['user_id']).exists()
-                if not request.isAuthenticated:
-                    request.session.flush()
+                # request.isAuthenticated = User.objects.filter(id=payload['user_id']).exists()
+                # if not request.isAuthenticated:
+                #     request.session.flush()
                 
+
+
         response = self.get_response(request)
         return response

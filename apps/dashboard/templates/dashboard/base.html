@@ -112,7 +112,14 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
 
-                <div class="flex-shrink-0">
+                <div class="flex items-center gap-3 flex-shrink-0">
+                    
+                    {% if request.isAuthenticated %}
+                    <button type="button" onclick="toggleMobileMenu()" class="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none transition-colors">
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                    {% endif %}
+
                     <a href="/" class="flex items-center gap-2 group">
                         <i class="fa-solid fa-terminal text-brand-cyan text-xl group-hover:rotate-12 transition-transform duration-300"></i>
                         <span class="font-mono font-bold text-xl tracking-tighter">
@@ -169,12 +176,10 @@
                                 <p class="text-sm font-bold text-gray-900 dark:text-white font-mono truncate">{{  request.authenticated_user.username }}</p>
                             </div>
                             
-
                             {% if request.authenticated_user.seller_profile %}
                             <a href="{%url 'sellerProfileView'%}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-brand-purple transition-colors font-mono">
                                 <i class="fa-solid fa-user mr-2 text-xs"></i> Seller Profile
                             </a>
-                            
                             {%endif%}
                             
                             <a href="{%url 'profile'%}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-brand-purple transition-colors font-mono">
@@ -203,7 +208,7 @@
                     {% endif %}
                 </div>
 
-                <div class="-mr-2 flex md:hidden gap-2">
+                <div class="-mr-2 flex md:hidden items-center gap-2">
                     <button onclick="toggleMobileSearch()" class="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-brand-cyan transition-colors">
                         <i class="fa-solid fa-search text-lg"></i>
                     </button>
@@ -213,9 +218,44 @@
                         <i class="fa-solid fa-moon hidden dark:block"></i>
                     </button>
                     
+                    {% if request.isAuthenticated %}
+                    <div class="relative ml-1">
+                        <button onclick="toggleMobileProfileMenu()" class="flex items-center focus:outline-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-8 h-8 rounded-full shadow-lg">
+                                <defs>
+                                    <linearGradient id="user-grad-mobile" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" style="stop-color:#94a3b8;stop-opacity:1" /> 
+                                        <stop offset="100%" style="stop-color:#1e293b;stop-opacity:1" /> 
+                                    </linearGradient>
+                                </defs>
+                                <circle cx="12" cy="12" r="12" fill="url(#user-grad-mobile)"/>
+                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" fill="#ffffff" fill-opacity="0.95"/>
+                            </svg>
+                        </button>
+
+                        <div id="mobile-profile-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-[#18181b] rounded-xl shadow-2xl border border-gray-200 dark:border-gray-800 py-2 z-50 transform origin-top-right">
+                             <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-800 mb-1">
+                                <p class="text-xs text-gray-500 font-mono">Signed in as</p>
+                                <p class="text-sm font-bold text-gray-900 dark:text-white font-mono truncate">{{  request.authenticated_user.username }}</p>
+                            </div>
+                             {% if request.authenticated_user.seller_profile %}
+                            <a href="{%url 'sellerProfileView'%}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-brand-purple transition-colors font-mono">
+                                <i class="fa-solid fa-user mr-2 text-xs"></i> Seller Profile
+                            </a>
+                            {%endif%}
+                            <a href="{%url 'profile'%}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-brand-purple transition-colors font-mono">
+                                <i class="fa-solid fa-user mr-2 text-xs"></i> Profile
+                            </a>
+                            <a href="{% url 'logout' %}" class="block px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors font-mono">
+                                <i class="fa-solid fa-arrow-right-from-bracket mr-2 text-xs"></i> Logout
+                            </a>
+                        </div>
+                    </div>
+                    {% else %}
                     <button type="button" onclick="toggleMobileMenu()" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none transition-colors">
                         <i class="fa-solid fa-bars text-xl"></i>
                     </button>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -232,7 +272,7 @@
         </div>
     </nav>
 
-    <div id="mobile-drawer" class="fixed inset-y-0 right-0 w-72 bg-[#09090b] border-l border-gray-800 transform translate-x-full transition-transform duration-300 ease-in-out z-[60] flex flex-col shadow-2xl h-[100dvh]">
+    <div id="mobile-drawer" class="fixed inset-y-0 left-0 w-72 bg-[#09090b] border-r border-gray-800 transform -translate-x-full transition-transform duration-300 ease-in-out z-[60] flex flex-col shadow-2xl h-[100dvh]">
         
         <div class="flex items-center justify-between px-6 py-4 border-b border-gray-800 flex-shrink-0">
             <span class="font-mono font-bold text-lg text-white">MENU</span>
@@ -249,37 +289,16 @@
             <a href="{% url 'contact' %}" class="block px-4 py-3 rounded-lg text-base font-medium text-gray-300 hover:text-white hover:bg-white/5 font-mono transition-colors border-l-2 border-transparent hover:border-white">Contact</a>
         </div>
 
+        {% if not request.isAuthenticated %}
         <div class="p-4 pb-12 border-t border-gray-800 bg-black/20 space-y-3 flex-shrink-0">
-            
-            {% if request.isAuthenticated %}
-            <a href="{% url 'profile'%}" class="flex items-center justify-center gap-3 w-full px-4 py-3 rounded-lg border border-gray-700 text-gray-200 hover:text-white hover:bg-white/5 font-mono transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-6 h-6 rounded-full shadow-md">
-                    <defs>
-                        <linearGradient id="sm-circle-grad-mono-mobile" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" style="stop-color:#94a3b8;stop-opacity:1" />
-                            <stop offset="100%" style="stop-color:#1e293b;stop-opacity:1" />
-                        </linearGradient>
-                    </defs>
-                    <circle cx="12" cy="12" r="12" fill="url(#sm-circle-grad-mono-mobile)"/>
-                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" fill="#ffffff" fill-opacity="0.9"/>
-                </svg>
-                <span class="font-bold">{{  request.authenticated_user.username }}</span>
-            </a>
-
-            <a href="{% url 'logout' %}" class="block w-full text-center px-4 py-3 rounded-lg bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500/20 font-bold font-mono transition-colors">
-                Logout
-            </a>
-            
-            {% else %}
             <a href="{% url 'register' %}" class="block w-full text-center px-4 py-3 rounded-lg bg-gradient-to-r from-brand-pink to-brand-purple text-white font-bold font-mono shadow-lg">
                 Join_Us
             </a>
             <a href="{% url 'login' %}" class="block w-full text-center px-4 py-3 rounded-lg border border-gray-700 text-gray-300 hover:text-white hover:bg-white/5 font-mono transition-colors">
                 Login
             </a>
-            {% endif %}
-
         </div>
+        {% endif %}
     </div>
 
     <div id="drawer-backdrop" onclick="toggleMobileMenu()" class="fixed inset-0 bg-black/50 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300 z-[55]"></div>
@@ -395,11 +414,12 @@
     function toggleMobileMenu() {
         isMenuOpen = !isMenuOpen;
         if (isMenuOpen) {
-            drawer.classList.remove('translate-x-full');
+            // Changed from translate-x-full to translate-x-0 for left-side open
+            drawer.classList.remove('-translate-x-full');
             backdrop.classList.remove('opacity-0', 'pointer-events-none');
             body.classList.add('overflow-hidden');
         } else {
-            drawer.classList.add('translate-x-full');
+            drawer.classList.add('-translate-x-full');
             backdrop.classList.add('opacity-0', 'pointer-events-none');
             body.classList.remove('overflow-hidden');
         }
@@ -417,14 +437,26 @@
         dropdown.classList.toggle('hidden');
     }
 
+    // --- MOBILE PROFILE DROPDOWN LOGIC ---
+    function toggleMobileProfileMenu() {
+        const dropdown = document.getElementById('mobile-profile-dropdown');
+        dropdown.classList.toggle('hidden');
+    }
+
     // Close dropdown when clicking outside
     window.addEventListener('click', function(e) {
+        // Desktop
         const dropdown = document.getElementById('profile-dropdown');
         const button = e.target.closest('button[onclick="toggleProfileMenu()"]');
-        
-        // If clicking outside the dropdown AND not on the button
         if (!button && !dropdown.contains(e.target)) {
             dropdown.classList.add('hidden');
+        }
+
+        // Mobile
+        const mobileDropdown = document.getElementById('mobile-profile-dropdown');
+        const mobileButton = e.target.closest('button[onclick="toggleMobileProfileMenu()"]');
+        if (mobileDropdown && !mobileButton && !mobileDropdown.contains(e.target)) {
+            mobileDropdown.classList.add('hidden');
         }
     });
 </script>

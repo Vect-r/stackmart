@@ -8,6 +8,7 @@ urlpatterns = [
     path('dashboard/profile/update', profileUpdate, name='profileUpdate'),
     path('dashboard/seller/onboarding', sellerOnboarding, name='sellerOnboarding'),
     path('dashboard/seller/profile', sellerProfileView, name='sellerProfileView'),
+    path('profile/seller/<uuid:seller_id>', sellerProfilePublicView, name='sellerProfilePublicView'),
     path('dashboard/seller/update', sellerProfileEdit, name='sellerProfileEdit'),
     path('logout/', logout, name='logout'),
     path('login/', login, name='login'),

@@ -1,8 +1,9 @@
 from django.contrib import admin
-from apps.users.models import User, UserVerification, Service, SocialLink, SellerProfile
+from apps.users.models import User, UserVerification, Service, SocialLink, SellerProfile, ConnectionRequest
 
 class UserAdmin(admin.ModelAdmin):
     list_filter = ["is_active"]
+
 
 
 admin.site.register(User, UserAdmin)
@@ -12,6 +13,7 @@ admin.site.register(User, UserAdmin)
 admin.site.register(UserVerification)
 admin.site.register(SocialLink)
 admin.site.register(SellerProfile)
+
 
 @admin.register(Service)
 class ServiceAdmin(admin.ModelAdmin):
@@ -25,3 +27,9 @@ class ServiceAdmin(admin.ModelAdmin):
     # Custom column to see popularity in Admin panel
     def seller_count(self, obj):
         return obj.sellers.count()
+    
+@admin.register(ConnectionRequest)
+class ConnectionAdmin(admin.ModelAdmin):
+    list_display = ('status', 'sender', 'receiver', 'created_at')
+    list_filter = ('status',)
+
