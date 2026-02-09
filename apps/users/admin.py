@@ -32,4 +32,12 @@ class ServiceAdmin(admin.ModelAdmin):
 class ConnectionAdmin(admin.ModelAdmin):
     list_display = ('status', 'sender', 'receiver', 'created_at')
     list_filter = ('status',)
+    actions = ['make_connections_accepted','make_connections_pending']
+
+    def make_connections_accepted(self, request, queryset):
+        queryset.update(status="accepted")
+
+    def make_connections_pending(self,request,queryset):
+        queryset.update(status="pending")
+
 

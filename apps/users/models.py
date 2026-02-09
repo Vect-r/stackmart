@@ -42,6 +42,9 @@ class User(BaseClass):
         self.profile = "defaults/user-avatar.svg"
         self.save()
 
+    def __str__(self):
+        return f"{self.username} -> {self.id}"
+
 
 class Service(models.Model):
     name = models.CharField(max_length=100, unique=True)

@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from apps.master.utils.inputValidators import *
 from apps.master.auth.utils import *
-from apps.users.models import User, UserVerification, SellerProfile, Service, SocialLink
+from apps.users.models import User, UserVerification, SellerProfile, Service, SocialLink, ConnectionRequest
 from django.views.decorators.cache import never_cache
 # from django.core.mail import send_mail
 # from django.template.loader import render_to_string
@@ -17,7 +17,9 @@ from django.http import JsonResponse
 import json
 from django.utils import timezone
 from django.db import transaction, IntegrityError
-from apps.users.services import getExistingRequest
+from django.db.models import Q
+from django.core import serializers
+from apps.users.services import *
 from django.http import Http404
 
 
@@ -245,7 +247,7 @@ def verifyNewMail(request,tokenId):
 def profile(request):
     user = request.authenticated_user
     isDefaultAvatar=User._meta.get_field('profile').get_default()==user.profile
-    return render(request,'dashboard/profile.html',{'user':user,'isDefaultAvatar':isDefaultAvatar})
+    return render(request,'dashboard/profile.html',{'user':user,'isDefaultAvatar':isDefaultAvatar,'connection_count':getConnectionsCount(request.authenticated_user)})
 
 @login_required_jwt
 @require_POST
@@ -293,6 +295,10 @@ def profileUpdate(request):
         'message': f'Done. {message}',
         'new_avatar_url': user.profile.url
     })
+
+@login_required_jwt
+def sellerOnboardingOutro(request):
+    return render(request,'dashboard/seller_onboarding_loader.html')
 
 @login_required_jwt
 def sellerOnboarding(request):
@@ -363,24 +369,42 @@ def sellerOnboarding(request):
 
 @login_required_jwt
 def sellerProfileView(request):
-    if request.authenticated_user.user_type=="buyer":
+    if request.authenticated_user.user_type=="buyer" or not hasattr(request.authenticated_user,'seller_profile'):
         raise Http404("Page Not Found.")
-    return render(request,'dashboard/seller_card.html',{'seller':request.authenticated_user.seller_profile})
 
+    # print(getConnections(request.authenticated_user).count())
+    return render(request,'dashboard/seller_card.html',{'seller':request.authenticated_user.seller_profile,'connection_count':getConnectionsCount(request.authenticated_user)})
+
+@login_required_jwt
+def sendRequest(request,receiver_id):
+    if request.authenticated_user.id == receiver_id:
+        raise Http404('Page Not Found')
+    else:
+        receiver = get_object_or_404(User,id=receiver_id)
+        send_connection_request(request.authenticated_user,receiver)
+
+    
+    
+    return redirect('profilePublicView',user_id = receiver.id)
+
+
+#This function is to be deprecated.
 def sellerProfilePublicView(request,seller_id):
     getSellerProfile = get_object_or_404(SellerProfile,id = seller_id)
     connection_status = None
 
     #At first we will check if user is authenicated or not.
     if request.isAuthenticated:
-        #if user is not same
+        #if user is not same as profile view
         if getSellerProfile.user.id != request.authenticated_user.id:
             existing_request = getExistingRequest(request.authenticated_user,getSellerProfile.user)
+            print(existing_request)
             if existing_request:
                 connection_status = existing_request.status
+            
                 # If the viewer sent it and it's pending
-                if existing_request.sender == request.authenticated_user and existing_request.status == 'pending':
-                     connection_status = 'sent_pending'
+                # if existing_request.sender == request.authenticated_user and existing_request.status == 'pending':
+                #      connection_status = 'sent_pending'
 
     # print(request.isAuthenticated)
 
@@ -394,6 +418,34 @@ def sellerProfilePublicView(request,seller_id):
     }
     
     return render(request, 'dashboard/public_seller_profile.html', context)
+
+def profilePublicView(request,user_id):
+    #1. First we will get User Object from id or else raise 404
+    store={
+            'seller':{'template_path':'dashboard/public_seller_profile.html'},
+            'buyer':{'template_path':'dashboard/public_buyer_profile.html'},
+        }
+
+    getUser = get_object_or_404(User,id=user_id)
+    context = {
+        'existing_request':None,
+        'next_url':request.path
+    }
+
+    connection_status = None
+
+    if getUser.user_type=="seller" and hasattr(getUser,'seller_profile'):
+        context['seller']=getUser.seller_profile
+    else:
+        context['buyer']=getUser
+
+    #if current user is authenticated
+    if request.isAuthenticated:
+        #if profile's user is not same as current user
+        if getUser.id!=request.authenticated_user.id:
+            context['existing_request'] = getExistingRequest(request.authenticated_user,getUser.id)
+
+    return render(request,store[getUser.user_type]['template_path'],context)
 
 @login_required_jwt
 def sellerProfileEdit(request):
@@ -492,6 +544,27 @@ def sellerProfileEdit(request):
     }
     
     return render(request, 'dashboard/seller_edit.html', context)
+
+@login_required_jwt
+def connections(request):
+    user = request.authenticated_user
+
+    context={}
+    context['active_connections'] = getConnections(user)
+    context['pending_requests'] = getPendingConnections(user)
+    # print(context['active_connections'])
+    # print(context['pending_requests'])
+
+    return render(request,'dashboard/connections.html',context)
+
+@login_required_jwt
+def accept_connection(request,sender_id):
+    sender = User.objects.get(id = sender_id)
+    connectionRequest = ConnectionRequest.objects.get(sender = sender,receiver = request.authenticated_user)
+    connectionRequest.status = "accepted"
+    connectionRequest.save()
+    messages.success(request,f'You accepted {sender.username} request.')
+    return redirect('connections')
 
 def blog(request):
 

@@ -1,0 +1,88 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Creating Profile... | Stackmart{% endblock %}
+
+{% block content %}
+<div class="fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-hidden bg-[#09090b]">
+    
+    <div class="absolute inset-0 opacity-40">
+        <div class="absolute inset-0 bg-gradient-to-br from-brand-purple via-brand-cyan to-brand-pink animate-gradient-xy"></div>
+    </div>
+    
+    <div class="absolute inset-0 opacity-[0.03]" style="background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E');"></div>
+
+    <div class="relative z-10 text-center px-4 max-w-lg w-full">
+        
+        <div class="mb-8 relative inline-block">
+            <div class="absolute inset-0 bg-brand-cyan blur-xl opacity-20 animate-pulse"></div>
+            <i class="fa-solid fa-store text-6xl text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400 drop-shadow-2xl"></i>
+        </div>
+
+        <h1 class="text-3xl md:text-4xl font-bold font-mono text-white mb-4 tracking-tight">
+            Setting Up Shop<span class="animate-pulse">...</span>
+        </h1>
+        
+        <p class="text-gray-400 font-mono text-sm mb-10">
+            Initializing seller dashboard and configuring your workspace.
+        </p>
+
+        <div class="w-full bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-full h-2 overflow-hidden mb-4 relative">
+            <div id="progress-bar" class="h-full bg-gradient-to-r from-brand-cyan to-brand-purple rounded-full w-0 shadow-[0_0_10px_rgba(0,223,216,0.5)]"></div>
+        </div>
+
+        <p id="status-text" class="text-xs text-gray-500 font-mono uppercase tracking-widest">
+            Allocating Resources...
+        </p>
+
+    </div>
+</div>
+
+<style>
+    /* Custom Animation for Gradient Movement */
+    @keyframes gradient-xy {
+        0%, 100% { background-position: 0% 50%; background-size: 200% 200%; }
+        50% { background-position: 100% 50%; background-size: 200% 200%; }
+    }
+    .animate-gradient-xy {
+        animation: gradient-xy 6s ease infinite;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const progressBar = document.getElementById('progress-bar');
+        const statusText = document.getElementById('status-text');
+        const duration = 10000; // 10 seconds
+        const steps = [
+            { pct: 10, text: "Verifying credentials..." },
+            { pct: 30, text: "Generating storefront..." },
+            { pct: 60, text: "Syncing services..." },
+            { pct: 85, text: "Finalizing dashboard..." },
+            { pct: 100, text: "Ready!" }
+        ];
+
+        // 1. Animate Progress Bar (CSS Transition)
+        // We set transition duration to match the total wait time linearly
+        setTimeout(() => {
+            progressBar.style.transition = `width ${duration}ms linear`;
+            progressBar.style.width = '100%';
+        }, 100);
+
+        // 2. Animate Text Steps
+        steps.forEach(step => {
+            const time = (step.pct / 100) * duration;
+            setTimeout(() => {
+                statusText.innerText = step.text;
+                statusText.classList.add('animate-pulse');
+                setTimeout(() => statusText.classList.remove('animate-pulse'), 500);
+            }, time);
+        });
+
+        // 3. Redirect after 10 seconds
+        setTimeout(() => {
+            window.location.href = "{% url 'dashboard' %}";
+        }, duration + 500); // Small buffer
+    });
+</script>
+{% endblock %}
