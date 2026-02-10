@@ -387,38 +387,6 @@ def sendRequest(request,receiver_id):
     
     return redirect('profilePublicView',user_id = receiver.id)
 
-
-#This function is to be deprecated.
-def sellerProfilePublicView(request,seller_id):
-    getSellerProfile = get_object_or_404(SellerProfile,id = seller_id)
-    connection_status = None
-
-    #At first we will check if user is authenicated or not.
-    if request.isAuthenticated:
-        #if user is not same as profile view
-        if getSellerProfile.user.id != request.authenticated_user.id:
-            existing_request = getExistingRequest(request.authenticated_user,getSellerProfile.user)
-            print(existing_request)
-            if existing_request:
-                connection_status = existing_request.status
-            
-                # If the viewer sent it and it's pending
-                # if existing_request.sender == request.authenticated_user and existing_request.status == 'pending':
-                #      connection_status = 'sent_pending'
-
-    # print(request.isAuthenticated)
-
-    context = {
-        'seller': getSellerProfile,
-        'is_guest': None,
-        'is_own_profile': None,
-        'connection_status': connection_status, # 'sent_pending', 'accepted', or None
-        # We pass the current URL path so login can redirect back here
-        'next_url': request.path 
-    }
-    
-    return render(request, 'dashboard/public_seller_profile.html', context)
-
 def profilePublicView(request,user_id):
     #1. First we will get User Object from id or else raise 404
     store={
@@ -431,8 +399,6 @@ def profilePublicView(request,user_id):
         'existing_request':None,
         'next_url':request.path
     }
-
-    connection_status = None
 
     if getUser.user_type=="seller" and hasattr(getUser,'seller_profile'):
         context['seller']=getUser.seller_profile

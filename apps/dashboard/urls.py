@@ -9,7 +9,6 @@ urlpatterns = [
     path('dashboard/seller/onboarding', sellerOnboarding, name='sellerOnboarding'),
     path('dashboard/seller/done', sellerOnboardingOutro, name='sellerOnboardingOutro'),
     path('dashboard/seller/profile', sellerProfileView, name='sellerProfileView'),
-    path('profile/seller/<uuid:seller_id>', sellerProfilePublicView, name='sellerProfilePublicView'),
     path('profile/<uuid:user_id>', profilePublicView, name='profilePublicView'),
     path('profile/connect/<uuid:receiver_id>', sendRequest, name='sendRequest'),
     path('profile/accept/<uuid:sender_id>', accept_connection, name='accept_connection'),
