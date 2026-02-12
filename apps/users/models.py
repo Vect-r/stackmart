@@ -2,6 +2,7 @@ from django.db import models
 from apps.master.models import BaseClass
 import os
 from django.utils import timezone
+from django.utils.text import slugify
 
 # Create your models here.
 
@@ -183,3 +184,57 @@ class ConnectionRequest(models.Model):
 
     def __str__(self):
         return f"{self.sender} -> {self.receiver} ({self.status})"
+    
+def blog_image_upload_path(instance, filename):
+    return os.path.join(f'blog_media/{instance.blog.id}/{filename}')
+
+def blog_cover_upload_path(instance,filename):
+    return os.path.join(f"blog_media/{instance.id}/cover_photo.jpg")
+    
+
+class BlogCategory(models.Model):
+    name = models.CharField(max_length=100,unique=True)
+    slug = models.SlugField(max_length=30,unique=True,null=True,blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug: # only generate slug if it's not set
+            self.slug = slugify(self.name)
+        super(BlogCategory, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
+    
+class Blog(BaseClass):
+    # BLOG_STATUS_CHOICES =  (
+    #     ('under_review','Under Review'),
+    #     ('draft','Draft'),
+    #     ('rejected')
+    #     ('published','Published')
+    # )
+
+    class Status(models.TextChoices):
+        DRAFT = "draft", "Draft"
+        SUBMITTED = "submitted", "Submitted for Review"
+        APPROVED = "approved", "Approved"
+        REJECTED = "rejected", "Rejected"
+
+
+    author = models.ForeignKey(User,related_name="blogs",on_delete=models.CASCADE)
+    category = models.ForeignKey(BlogCategory,related_name="blogs",on_delete=models.CASCADE,null=True)
+    body = models.TextField(null=True,blank=True)
+    title = models.CharField(null=True,blank=True)
+    summary = models.CharField(max_length=200,null=True,blank=True)
+    cover_image = models.ImageField(upload_to=blog_cover_upload_path, blank=True, null=True)
+    status = models.CharField(max_length=100,choices= Status.choices, default=Status.DRAFT)
+    
+    class Meta:
+        ordering = ['-created_at']
+
+
+class BlogImage(models.Model):
+    image = models.ImageField(upload_to=blog_image_upload_path)
+    blog = models.ForeignKey(
+        Blog, 
+        on_delete=models.CASCADE, 
+        related_name='images' # This allows access via blog.images.all()
+    )

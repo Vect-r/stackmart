@@ -1,6 +1,5 @@
 from django.contrib import admin
-from apps.users.models import User, UserVerification, Service, SocialLink, SellerProfile, ConnectionRequest
-
+from apps.users.models import *
 class UserAdmin(admin.ModelAdmin):
     list_filter = ["is_active"]
 
@@ -40,4 +39,11 @@ class ConnectionAdmin(admin.ModelAdmin):
     def make_connections_pending(self,request,queryset):
         queryset.update(status="pending")
 
+@admin.register(BlogCategory)
+class BlogCategoryAdmin(admin.ModelAdmin):
+    readonly_fields = ('slug',)
 
+admin.site.register(Blog)
+# admin.site.register(BlogCategory)
+
+admin.site.register(BlogImage)

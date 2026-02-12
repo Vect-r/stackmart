@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from apps.master.utils.inputValidators import *
 from apps.master.auth.utils import *
-from apps.users.models import User, UserVerification, SellerProfile, Service, SocialLink, ConnectionRequest
+from apps.users.models import User, UserVerification, SellerProfile, Service, SocialLink, ConnectionRequest, Blog, BlogCategory, BlogImage
 from django.views.decorators.cache import never_cache
 # from django.core.mail import send_mail
 # from django.template.loader import render_to_string
@@ -10,7 +10,7 @@ from django.views.decorators.cache import never_cache
 # from django.conf import settings
 # from django.contrib.sites.shortcuts import get_current_site
 from datetime import datetime, timedelta, UTC
-from apps.users.forms import PasswordResetForm
+from apps.users.forms import PasswordResetForm, BlogForm
 from .mailings import MailSender
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse
@@ -21,7 +21,7 @@ from django.db.models import Q
 from django.core import serializers
 from apps.users.services import *
 from django.http import Http404
-
+import os
 
 
 mailObj = MailSender()
@@ -535,4 +535,62 @@ def accept_connection(request,sender_id):
 def blog(request):
 
     return render(request, "dashboard/blog.html")
+
+# def upload_blog_image(request, blog_id):
+#     # ... checks ...
+#     image_file = request.FILES['image']
+    
+#     # Django saves and renames here if necessary
+#     blog_image = BlogImage.objects.create(blog=blog, image=image_file)
+    
+#     # Get the ACTUAL name on disk (e.g., "image_1.jpg")
+#     actual_filename = os.path.basename(blog_image.image.name)
+
+#     return JsonResponse({
+#         'status': 'success',
+#         'url': blog_image.image.url,
+#         'filename': actual_filename # Send this instead of image_file.name
+#     })
+
+def upload_blog_image(request, blog_id):
+    if request.method == 'POST' and request.FILES.get('image'):
+        blog = get_object_or_404(Blog, id=blog_id, author=request.authenticated_user)
+        image_file = request.FILES['image']
+        
+        # Create the image object
+        blog_image = BlogImage.objects.create(blog=blog, image=image_file)
+        
+        # Return the URL to the frontend
+        return JsonResponse({
+            'status': 'success',
+            'url': blog_image.image.url,
+            'filename': image_file.name
+        })
+    return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
+
+@login_required_jwt
+def blogCreate(request,blog_id=None):
+    if request.method=="POST" and blog_id:
+        blog = get_object_or_404(Blog,id=blog_id,author=request.authenticated_user)
+        form = BlogForm(request.POST,request.FILES,instance=blog)
+        if form.is_valid():
+            blog_obj = form.save(commit=False)
+            action = request.POST.get("status")
+            if action == "submitted":
+                blog_obj.status = Blog.Status.SUBMITTED
+
+            blog_obj.save()
+        else:
+            print(form.errors)
+
+    context={}
+    
+    if blog_id is None:
+        blog=Blog.objects.create(author=request.authenticated_user)
+        return redirect('blogEdit',blog_id=blog.id)
+
+    context['categories'] = BlogCategory.objects.all()
+    context['blog']= get_object_or_404(Blog,id=blog_id,author=request.authenticated_user,status="draft")
+    return render(request,'dashboard/blog_create.html',context)
+
 
