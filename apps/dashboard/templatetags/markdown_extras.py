@@ -8,16 +8,22 @@ register = template.Library()
 @stringfilter
 def markdown(value):
     return md.markdown(value, extensions=[
-        'markdown.extensions.fenced_code',  # Helper for code blocks
-        'markdown.extensions.codehilite',   # <--- SYNTAX HIGHLIGHTING (Colors)
+        'markdown.extensions.fenced_code',
+        'markdown.extensions.codehilite',
         'markdown.extensions.tables',
         'markdown.extensions.nl2br',
-        'markdown.extensions.sane_lists',   # <--- Fixes List Issues
-        'pymdownx.tilde',                   # <--- Fixes ~~Strikethrough~~
+        'markdown.extensions.sane_lists',
+        'markdown.extensions.def_list',  # <--- ADDS DEFINITION LIST SUPPORT
+        'pymdownx.tilde',
+        'pymdownx.tasklist',
     ], extension_configs={
         'markdown.extensions.codehilite': {
             'css_class': 'highlight',
             'use_pygments': True,
-            'noclasses': False,             # Use CSS classes for coloring
+            'noclasses': False,
+        },
+        'pymdownx.tasklist': {
+            'custom_checkbox': True,
+            'clickable_checkbox': False,
         }
     })

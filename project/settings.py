@@ -47,7 +47,8 @@ INSTALLED_APPS = [
 INSTALLED_APPS += [
     'apps.master',
     'apps.dashboard',
-    'apps.users'
+    'apps.users',
+    'apps.chats'
 ]
 
 # THIRDPARTY_APPS

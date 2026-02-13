@@ -581,3 +581,9 @@ def blogView(request,blog_id):
     context={}
     context['blog'] = get_object_or_404(Blog,id=blog_id,status='draft')
     return render(request,'dashboard/blog_view.html',context)
+
+@login_required_jwt
+def chatsView(request,viewer=None):
+    if viewer=="gemini":
+        return render(request, 'dashboard/chat-demo-gemini.html')    
+    return render(request, 'dashboard/chat-demo.html')

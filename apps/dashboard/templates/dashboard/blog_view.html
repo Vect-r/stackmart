@@ -5,13 +5,12 @@
 {% block title %}{{ blog.title }} | Stackmart Logs{% endblock %}
 
 {% block content %}
-<div class="min-h-screen relative pb-20 bg-gray-50 dark:bg-[#09090b] transition-colors duration-300">
+<div class="min-h-screen relative pb-20 bg-gray-50 dark:bg-[#09090b] transition-colors duration-300 bg-white shadow-[-1px_-1px_58px_-12px_cyan] dark:shadow-none  p-8 md:p-12 ">
     
     <div class="hidden dark:block fixed top-20 right-0 w-[500px] h-[500px] bg-brand-purple/10 rounded-full blur-[100px] -z-10 pointer-events-none"></div>
     <div class="hidden dark:block fixed bottom-0 left-0 w-[500px] h-[500px] bg-brand-cyan/10 rounded-full blur-[100px] -z-10 pointer-events-none"></div>
 
     <div class="w-full bg-white dark:bg-[#09090b] border-b border-gray-200 dark:border-gray-800 pt-24 pb-12 px-4 relative overflow-hidden transition-colors duration-300">
-        
         <div class="absolute inset-0 opacity-[0.03] dark:opacity-10 pointer-events-none" 
              style="background-image: linear-gradient(#3f3f46 1px, transparent 1px), linear-gradient(to right, #3f3f46 1px, transparent 1px); background-size: 40px 40px;">
         </div>
@@ -38,17 +37,14 @@
                     {% endif %}
                     <span class="text-gray-700 dark:text-gray-300 font-bold">@{{ blog.author.username }}</span>
                 </div>
-                
                 <div class="flex items-center gap-2">
                     <i class="fa-regular fa-calendar text-brand-purple dark:text-brand-cyan"></i>
                     <span>{{ blog.created_at|date:"M d, Y" }}</span>
                 </div>
-
                 <div class="flex items-center gap-2">
                     <i class="fa-regular fa-clock text-brand-pink"></i>
                     <span>{{ blog.read_time|default:"5" }} min read</span>
                 </div>
-
                 {% if request.user == blog.author %}
                 <a href="{% url 'edit_blog' blog.id %}" class="ml-auto px-3 py-1 rounded border border-gray-300 dark:border-gray-700 hover:border-brand-purple hover:text-brand-purple transition-all text-xs">
                     <i class="fa-solid fa-pen-to-square mr-1"></i> Edit_Log
@@ -68,59 +64,36 @@
         {% endif %}
 
         <div class="stackmart-prose font-sans text-lg leading-relaxed text-gray-700 dark:text-gray-300 transition-colors duration-300
-            
-            /* HEADINGS */
-            [&_h1]:font-mono [&_h1]:font-bold [&_h1]:text-5xl [&_h1]:mt-12 [&_h1]:mb-8 [&_h1]:text-gray-900 dark:[&_h1]:text-white [&_h1]:border-b [&_h1]:border-gray-200 dark:[&_h1]:border-gray-800 [&_h1]:pb-4
-            [&_h2]:font-mono [&_h2]:font-bold [&_h2]:text-3xl [&_h2]:mt-12 [&_h2]:mb-6 [&_h2]:text-gray-800 dark:[&_h2]:text-white [&_h2]:border-b [&_h2]:border-gray-100 dark:[&_h2]:border-gray-800/50 [&_h2]:pb-2
-            [&_h3]:font-mono [&_h3]:font-bold [&_h3]:text-2xl [&_h3]:mt-8 [&_h3]:mb-4 [&_h3]:text-brand-cyan
-            
-            /* LINKS & TEXT */
-            [&_a]:text-brand-purple dark:[&_a]:text-brand-cyan [&_a]:underline [&_a]:underline-offset-4 hover:[&_a]:text-brand-pink dark:hover:[&_a]:text-brand-pink [&_a]:transition-colors
-            [&_p]:mb-6 
-            [&_strong]:font-bold [&_strong]:text-black dark:[&_strong]:text-white
-            
-            /* STRIKETHROUGH */
-            [&_del]:opacity-60 [&_del]:decoration-2 [&_del]:decoration-red-500 [&_del]:text-gray-500
-            
-            /* LISTS */
-            [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:mb-6 
-            [&_ul_li::marker]:text-brand-purple dark:[&_ul_li::marker]:text-brand-cyan
-            
-            [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:mb-6 
-            [&_ol_li::marker]:text-gray-900 dark:[&_ol_li::marker]:text-white [&_ol_li::marker]:font-bold
-            
-            [&_li]:mb-2 [&_li]:pl-2
-            
-            /* CODE BLOCKS (The Container) */
-            [&_pre]:bg-gray-100 dark:[&_pre]:bg-[#131316] 
-            [&_pre]:border [&_pre]:border-gray-200 dark:[&_pre]:border-gray-800 
-            [&_pre]:rounded-xl [&_pre]:p-6 [&_pre]:my-8 
-            [&_pre]:overflow-x-auto [&_pre]:font-mono [&_pre]:text-sm 
-            [&_pre]:text-gray-800 dark:[&_pre]:text-gray-200
-            
-            /* INLINE CODE (The specific words) */
-            [&_code]:bg-gray-100 dark:[&_code]:bg-brand-purple/10 
-            [&_code]:text-brand-pink 
-            [&_code]:px-1.5 [&_code]:py-0.5 
-            [&_code]:rounded [&_code]:font-mono [&_code]:text-[0.9em] 
-            [&_code]:border [&_code]:border-gray-200 dark:[&_code]:border-brand-purple/20
-            
-            /* --- THE FIX: RESET CODE INSIDE PRE BLOCKS --- */
-            /* This removes the purple background from code inside code blocks */
-            [&_pre_code]:bg-transparent dark:[&_pre_code]:bg-transparent
-            [&_pre_code]:border-none 
-            [&_pre_code]:p-0 
-            [&_pre_code]:text-inherit
-            
-            /* BLOCKQUOTES */
-            [&_blockquote]:border-l-4 [&_blockquote]:border-brand-purple [&_blockquote]:pl-6 [&_blockquote]:italic [&_blockquote]:text-gray-500 [&_blockquote]:my-8
-            
-            /* IMAGES */
-            [&_img]:rounded-xl [&_img]:border [&_img]:border-gray-200 dark:[&_img]:border-gray-800 [&_img]:my-10 [&_img]:shadow-lg
-            ">
-            
-            {{ blog.body|markdown|safe }}
-        
+                    [&_h1]:font-mono [&_h1]:font-bold [&_h1]:text-5xl [&_h1]:mt-12 [&_h1]:mb-8 [&_h1]:text-gray-900 dark:[&_h1]:text-white [&_h1]:border-b [&_h1]:border-gray-200 dark:[&_h1]:border-gray-800 [&_h1]:pb-4
+                    [&_h2]:font-mono [&_h2]:font-bold [&_h2]:text-3xl [&_h2]:mt-12 [&_h2]:mb-6 [&_h2]:text-gray-800 dark:[&_h2]:text-white [&_h2]:border-b [&_h2]:border-gray-100 dark:[&_h2]:border-gray-800/50 [&_h2]:pb-2
+                    [&_h3]:font-mono [&_h3]:font-bold [&_h3]:text-2xl [&_h3]:mt-8 [&_h3]:mb-4 [&_h3]:text-brand-cyan
+                    [&_a]:text-brand-purple dark:[&_a]:text-brand-cyan [&_a]:underline [&_a]:underline-offset-4 hover:[&_a]:text-brand-pink dark:hover:[&_a]:text-brand-pink [&_a]:transition-colors
+                    [&_p]:mb-6 
+                    [&_strong]:font-bold [&_strong]:text-black dark:[&_strong]:text-white
+                    [&_del]:line-through [&_del]:opacity-60 [&_del]:decoration-2 [&_del]:decoration-red-500 [&_del]:text-gray-500
+                    [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:mb-6 [&_ul_li::marker]:text-brand-purple dark:[&_ul_li::marker]:text-brand-cyan
+                    [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:mb-6 [&_ol_li::marker]:text-gray-900 dark:[&_ol_li::marker]:text-white [&_ol_li::marker]:font-bold
+                    [&_li]:mb-2 [&_li]:pl-2
+                    [&_.task-list]:list-none [&_.task-list]:pl-0
+                    [&_.task-list-item]:flex [&_.task-list-item]:items-start [&_.task-list-item]:gap-3 [&_.task-list-item]:mb-2
+                    [&_dl]:mb-8 [&_dl]:p-0
+                    [&_dt]:font-mono [&_dt]:font-bold [&_dt]:text-lg [&_dt]:mt-6 [&_dt]:mb-2 [&_dt]:text-gray-900 dark:[&_dt]:text-white [&_dt]:border-l-4 [&_dt]:border-brand-purple dark:[&_dt]:border-brand-cyan [&_dt]:pl-3
+                    [&_dd]:pl-4 [&_dd]:ml-0 [&_dd]:mb-4 [&_dd]:text-gray-600 dark:[&_dd]:text-gray-400
+                    [&_table]:w-full [&_table]:border-separate [&_table]:border-spacing-0 [&_table]:rounded-xl [&_table]:overflow-hidden [&_table]:my-8 [&_table]:border [&_table]:border-gray-200 dark:[&_table]:border-gray-800
+                    [&_thead]:bg-gray-100 dark:[&_thead]:bg-[#131316]
+                    [&_th]:p-4 [&_th]:text-left [&_th]:font-mono [&_th]:font-bold [&_th]:border-b [&_th]:border-gray-200 dark:[&_th]:border-gray-800 [&_th]:text-gray-900 dark:[&_th]:text-brand-cyan
+                    [&_td]:p-4 [&_td]:border-b [&_td]:border-gray-200 dark:[&_td]:border-gray-800 [&_td]:text-gray-600 dark:[&_td]:text-gray-300
+                    [&_tr:nth-child(even)]:bg-gray-50 dark:[&_tr:nth-child(even)]:bg-[#1f1f23]/50
+                    [&_tr:last-child_td]:border-b-0
+                    [&_pre]:bg-gray-100 dark:[&_pre]:bg-[#131316] [&_pre]:border [&_pre]:border-gray-200 dark:[&_pre]:border-gray-800 [&_pre]:rounded-xl [&_pre]:p-6 [&_pre]:pt-12 [&_pre]:my-8 [&_pre]:overflow-x-auto [&_pre]:relative [&_pre]:font-mono [&_pre]:text-sm [&_pre]:text-gray-800 dark:[&_pre]:text-gray-200
+                    [&_pre_code]:bg-transparent dark:[&_pre_code]:bg-transparent [&_pre_code]:border-none [&_pre_code]:p-0 [&_pre_code]:text-inherit
+                    [&_code]:bg-gray-100 dark:[&_code]:bg-brand-purple/10 [&_code]:text-brand-pink [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded [&_code]:font-mono [&_code]:text-[0.9em] [&_code]:border [&_code]:border-gray-200 dark:[&_code]:border-brand-purple/20
+                    [&_blockquote]:border-l-4 [&_blockquote]:border-brand-purple [&_blockquote]:pl-6 [&_blockquote]:italic [&_blockquote]:text-gray-500 [&_blockquote]:my-8
+                    [&_img]:rounded-xl [&_img]:border [&_img]:border-gray-200 dark:[&_img]:border-gray-800 [&_img]:my-10 [&_img]:shadow-lg
+                    ">
+                    
+                    {{ blog.body|markdown|safe }}
+
         </div>
 
         <div class="mt-16 pt-8 border-t border-gray-200 dark:border-gray-800 flex flex-col md:flex-row items-center justify-between gap-6 transition-colors duration-300">
@@ -130,27 +103,82 @@
                     #{{ blog.category.name }}
                 </span>
             </div>
-            
-            <div class="flex items-center gap-4">
-                <span class="text-xs font-mono text-gray-500 uppercase">Share_Packet:</span>
-                <button class="w-8 h-8 rounded bg-white dark:bg-gray-800 border border-gray-200 dark:border-transparent hover:bg-[#1DA1F2] hover:border-[#1DA1F2] hover:text-white flex items-center justify-center transition-all text-gray-400 shadow-sm"><i class="fa-brands fa-twitter"></i></button>
+             <div class="flex items-center gap-4">
+                 <button class="w-8 h-8 rounded bg-white dark:bg-gray-800 border border-gray-200 dark:border-transparent hover:bg-[#1DA1F2] hover:border-[#1DA1F2] hover:text-white flex items-center justify-center transition-all text-gray-400 shadow-sm"><i class="fa-brands fa-twitter"></i></button>
                 <button class="w-8 h-8 rounded bg-white dark:bg-gray-800 border border-gray-200 dark:border-transparent hover:bg-[#0077b5] hover:border-[#0077b5] hover:text-white flex items-center justify-center transition-all text-gray-400 shadow-sm"><i class="fa-brands fa-linkedin"></i></button>
                 <button class="w-8 h-8 rounded bg-white dark:bg-gray-800 border border-gray-200 dark:border-transparent hover:bg-brand-cyan hover:border-brand-cyan hover:text-black flex items-center justify-center transition-all text-gray-400 shadow-sm"><i class="fa-solid fa-link"></i></button>
             </div>
         </div>
-
     </article>
 </div>
 
 <style>
-    /* Pygments Class Overrides for that "VS Code" look */
+    /* ... Pygments ... */
+    /* ... Checkboxes ... */
     .dark .stackmart-prose .hll { background-color: #333 }
-    .dark .stackmart-prose .c { color: #6b7280; font-style: italic } /* Comment */
-    .dark .stackmart-prose .k { color: #ff79c6; font-weight: bold } /* Keyword */
-    .dark .stackmart-prose .o { color: #ff79c6 } /* Operator */
-    .dark .stackmart-prose .s { color: #f1fa8c } /* String */
-    .dark .stackmart-prose .s2 { color: #a78bfa } /* String Double - Light Purple */
-    .dark .stackmart-prose .nt { color: #ff79c6 } /* Name.Tag */
-    .dark .stackmart-prose .na { color: #50fa7b } /* Name.Attribute */
+    .dark .stackmart-prose .c { color: #6b7280; font-style: italic }
+    .dark .stackmart-prose .k { color: #ff79c6; font-weight: bold }
+    .dark .stackmart-prose .o { color: #ff79c6 }
+    .dark .stackmart-prose .s { color: #f1fa8c }
+    .dark .stackmart-prose .s2 { color: #a78bfa }
+    .dark .stackmart-prose .nt { color: #ff79c6 }
+    .dark .stackmart-prose .na { color: #50fa7b }
+
+    /* CHECKBOX STYLES */
+    .stackmart-prose input[type="checkbox"] {
+        appearance: none; width: 1.25em; height: 1.25em;
+        border: 2px solid #d1d5db; border-radius: 4px;
+        background-color: transparent; cursor: not-allowed; position: relative; margin-top: 4px;
+    }
+    .dark .stackmart-prose input[type="checkbox"] { border-color: #4b5563; background-color: #1f2937; }
+    .stackmart-prose input[type="checkbox"]:checked { background-color: #7928ca; border-color: #7928ca; }
+    .dark .stackmart-prose input[type="checkbox"]:checked { background-color: #00dfd8; border-color: #00dfd8; }
+    .stackmart-prose input[type="checkbox"]:checked::after {
+        content: "✓"; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        color: white; font-size: 0.8em; font-weight: bold;
+    }
+    .dark .stackmart-prose input[type="checkbox"]:checked::after { color: black; }
 </style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const codeBlocks = document.querySelectorAll('pre code');
+        codeBlocks.forEach(code => {
+            const pre = code.parentElement;
+            pre.classList.add('group');
+            let langName = "Code";
+            code.classList.forEach(className => {
+                if (className.startsWith('language-')) {
+                    langName = className.replace('language-', '').toUpperCase();
+                }
+            });
+
+            const controls = document.createElement('div');
+            controls.className = "absolute top-0 right-0 flex items-center";
+
+            const copyBtn = document.createElement('button');
+            copyBtn.className = "mr-2 p-2 text-gray-400 hover:text-brand-cyan transition-all opacity-0 group-hover:opacity-100 flex items-center justify-center";
+            copyBtn.innerHTML = '<i class="fa-regular fa-copy"></i>';
+            copyBtn.addEventListener('click', () => {
+                navigator.clipboard.writeText(code.innerText).then(() => {
+                    copyBtn.innerHTML = '<i class="fa-solid fa-check text-green-500"></i>';
+                    setTimeout(() => { copyBtn.innerHTML = '<i class="fa-regular fa-copy"></i>'; }, 2000);
+                });
+            });
+
+            const label = document.createElement('div');
+            label.className = "px-3 py-1 bg-gray-200 dark:bg-[#1f1f23] text-gray-500 dark:text-gray-400 text-[10px] font-mono font-bold uppercase tracking-wider rounded-bl-lg border-l border-b border-gray-300 dark:border-gray-800";
+            label.innerText = langName;
+            
+            controls.appendChild(copyBtn);
+            controls.appendChild(label);
+            pre.appendChild(controls);
+
+            const dots = document.createElement('div');
+            dots.className = "absolute top-4 left-4 flex gap-1.5";
+            dots.innerHTML = `<div class="w-2.5 h-2.5 rounded-full bg-red-500/80"></div><div class="w-2.5 h-2.5 rounded-full bg-yellow-500/80"></div><div class="w-2.5 h-2.5 rounded-full bg-green-500/80"></div>`;
+            pre.appendChild(dots);
+        });
+    });
+</script>
 {% endblock %}

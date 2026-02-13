@@ -28,3 +28,7 @@ urlpatterns = [
     path('api/blog/<uuid:blog_id>/upload/',upload_blog_image,name="uploadBlogImage"),
     path('contact/', contact, name='contact'),
 ]
+
+# urlpatterns +=[
+#     path('chats/<str:viewer>',chatsView,name="chatView"),
+# ]
