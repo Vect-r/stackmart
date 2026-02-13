@@ -21,9 +21,10 @@ urlpatterns = [
     path('forgot-password/', forgot_password, name='forgot_password'),
     path('reset-password/<uuid:tokenId>/', reset_password, name='reset_password'),
     path('verify-mail/<uuid:tokenId>/', verifyNewMail, name='verify_new_mail'),
-    path('blog/', blog, name='blog'),
+    path('blogs/', blog, name='blog'),
     path('blog/create/', blogCreate, name="blogCreate"),
     path('blog/edit/<uuid:blog_id>', blogCreate, name="blogEdit"),
+    path('blog/<uuid:blog_id>', blogView, name="blogView"),
     path('api/blog/<uuid:blog_id>/upload/',upload_blog_image,name="uploadBlogImage"),
     path('contact/', contact, name='contact'),
 ]

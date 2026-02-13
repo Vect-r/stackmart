@@ -533,24 +533,7 @@ def accept_connection(request,sender_id):
     return redirect('connections')
 
 def blog(request):
-
     return render(request, "dashboard/blog.html")
-
-# def upload_blog_image(request, blog_id):
-#     # ... checks ...
-#     image_file = request.FILES['image']
-    
-#     # Django saves and renames here if necessary
-#     blog_image = BlogImage.objects.create(blog=blog, image=image_file)
-    
-#     # Get the ACTUAL name on disk (e.g., "image_1.jpg")
-#     actual_filename = os.path.basename(blog_image.image.name)
-
-#     return JsonResponse({
-#         'status': 'success',
-#         'url': blog_image.image.url,
-#         'filename': actual_filename # Send this instead of image_file.name
-#     })
 
 def upload_blog_image(request, blog_id):
     if request.method == 'POST' and request.FILES.get('image'):
@@ -594,3 +577,7 @@ def blogCreate(request,blog_id=None):
     return render(request,'dashboard/blog_create.html',context)
 
 
+def blogView(request,blog_id):
+    context={}
+    context['blog'] = get_object_or_404(Blog,id=blog_id,status='draft')
+    return render(request,'dashboard/blog_view.html',context)

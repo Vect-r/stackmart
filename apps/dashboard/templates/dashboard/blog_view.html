@@ -1,0 +1,156 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+{% load markdown_extras %} 
+
+{% block title %}{{ blog.title }} | Stackmart Logs{% endblock %}
+
+{% block content %}
+<div class="min-h-screen relative pb-20 bg-gray-50 dark:bg-[#09090b] transition-colors duration-300">
+    
+    <div class="hidden dark:block fixed top-20 right-0 w-[500px] h-[500px] bg-brand-purple/10 rounded-full blur-[100px] -z-10 pointer-events-none"></div>
+    <div class="hidden dark:block fixed bottom-0 left-0 w-[500px] h-[500px] bg-brand-cyan/10 rounded-full blur-[100px] -z-10 pointer-events-none"></div>
+
+    <div class="w-full bg-white dark:bg-[#09090b] border-b border-gray-200 dark:border-gray-800 pt-24 pb-12 px-4 relative overflow-hidden transition-colors duration-300">
+        
+        <div class="absolute inset-0 opacity-[0.03] dark:opacity-10 pointer-events-none" 
+             style="background-image: linear-gradient(#3f3f46 1px, transparent 1px), linear-gradient(to right, #3f3f46 1px, transparent 1px); background-size: 40px 40px;">
+        </div>
+
+        <div class="max-w-4xl mx-auto relative z-10">
+            <div class="flex items-center gap-2 text-xs font-mono text-gray-500 mb-6">
+                <a href="{% url 'blog' %}" class="hover:text-brand-purple dark:hover:text-brand-cyan transition-colors">/var/log</a>
+                <span>/</span>
+                <span class="text-brand-purple">{{ blog.category.slug }}</span>
+                <span>/</span>
+                <span class="text-gray-400 dark:text-gray-300 truncate max-w-[200px]">{{ blog.slug }}</span>
+            </div>
+
+            <h1 class="text-4xl md:text-6xl font-extrabold text-gray-900 dark:text-white font-mono tracking-tight leading-tight mb-6 transition-colors duration-300">
+                {{ blog.title }}
+            </h1>
+
+            <div class="flex flex-wrap items-center gap-6 text-sm font-mono text-gray-500 dark:text-gray-400">
+                <div class="flex items-center gap-2">
+                    {% if blog.author.profile %}
+                        <img src="{{ blog.author.profile.url }}" class="w-6 h-6 rounded-full border border-gray-200 dark:border-gray-700 object-cover">
+                    {% else %}
+                        <div class="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+                    {% endif %}
+                    <span class="text-gray-700 dark:text-gray-300 font-bold">@{{ blog.author.username }}</span>
+                </div>
+                
+                <div class="flex items-center gap-2">
+                    <i class="fa-regular fa-calendar text-brand-purple dark:text-brand-cyan"></i>
+                    <span>{{ blog.created_at|date:"M d, Y" }}</span>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <i class="fa-regular fa-clock text-brand-pink"></i>
+                    <span>{{ blog.read_time|default:"5" }} min read</span>
+                </div>
+
+                {% if request.user == blog.author %}
+                <a href="{% url 'edit_blog' blog.id %}" class="ml-auto px-3 py-1 rounded border border-gray-300 dark:border-gray-700 hover:border-brand-purple hover:text-brand-purple transition-all text-xs">
+                    <i class="fa-solid fa-pen-to-square mr-1"></i> Edit_Log
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <article class="max-w-4xl mx-auto px-4 mt-10">
+        
+        {% if blog.cover_image %}
+        <div class="rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-800 shadow-xl dark:shadow-2xl mb-12 group relative transition-all duration-300">
+            <div class="absolute inset-0 bg-gradient-to-t from-gray-50 dark:from-[#09090b] to-transparent opacity-20 dark:opacity-50"></div>
+            <img src="{{ blog.cover_image.url }}" alt="{{ blog.title }}" class="w-full h-auto max-h-[500px] object-cover">
+        </div>
+        {% endif %}
+
+        <div class="stackmart-prose font-sans text-lg leading-relaxed text-gray-700 dark:text-gray-300 transition-colors duration-300
+            
+            /* HEADINGS */
+            [&_h1]:font-mono [&_h1]:font-bold [&_h1]:text-5xl [&_h1]:mt-12 [&_h1]:mb-8 [&_h1]:text-gray-900 dark:[&_h1]:text-white [&_h1]:border-b [&_h1]:border-gray-200 dark:[&_h1]:border-gray-800 [&_h1]:pb-4
+            [&_h2]:font-mono [&_h2]:font-bold [&_h2]:text-3xl [&_h2]:mt-12 [&_h2]:mb-6 [&_h2]:text-gray-800 dark:[&_h2]:text-white [&_h2]:border-b [&_h2]:border-gray-100 dark:[&_h2]:border-gray-800/50 [&_h2]:pb-2
+            [&_h3]:font-mono [&_h3]:font-bold [&_h3]:text-2xl [&_h3]:mt-8 [&_h3]:mb-4 [&_h3]:text-brand-cyan
+            
+            /* LINKS & TEXT */
+            [&_a]:text-brand-purple dark:[&_a]:text-brand-cyan [&_a]:underline [&_a]:underline-offset-4 hover:[&_a]:text-brand-pink dark:hover:[&_a]:text-brand-pink [&_a]:transition-colors
+            [&_p]:mb-6 
+            [&_strong]:font-bold [&_strong]:text-black dark:[&_strong]:text-white
+            
+            /* STRIKETHROUGH */
+            [&_del]:opacity-60 [&_del]:decoration-2 [&_del]:decoration-red-500 [&_del]:text-gray-500
+            
+            /* LISTS */
+            [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:mb-6 
+            [&_ul_li::marker]:text-brand-purple dark:[&_ul_li::marker]:text-brand-cyan
+            
+            [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:mb-6 
+            [&_ol_li::marker]:text-gray-900 dark:[&_ol_li::marker]:text-white [&_ol_li::marker]:font-bold
+            
+            [&_li]:mb-2 [&_li]:pl-2
+            
+            /* CODE BLOCKS (The Container) */
+            [&_pre]:bg-gray-100 dark:[&_pre]:bg-[#131316] 
+            [&_pre]:border [&_pre]:border-gray-200 dark:[&_pre]:border-gray-800 
+            [&_pre]:rounded-xl [&_pre]:p-6 [&_pre]:my-8 
+            [&_pre]:overflow-x-auto [&_pre]:font-mono [&_pre]:text-sm 
+            [&_pre]:text-gray-800 dark:[&_pre]:text-gray-200
+            
+            /* INLINE CODE (The specific words) */
+            [&_code]:bg-gray-100 dark:[&_code]:bg-brand-purple/10 
+            [&_code]:text-brand-pink 
+            [&_code]:px-1.5 [&_code]:py-0.5 
+            [&_code]:rounded [&_code]:font-mono [&_code]:text-[0.9em] 
+            [&_code]:border [&_code]:border-gray-200 dark:[&_code]:border-brand-purple/20
+            
+            /* --- THE FIX: RESET CODE INSIDE PRE BLOCKS --- */
+            /* This removes the purple background from code inside code blocks */
+            [&_pre_code]:bg-transparent dark:[&_pre_code]:bg-transparent
+            [&_pre_code]:border-none 
+            [&_pre_code]:p-0 
+            [&_pre_code]:text-inherit
+            
+            /* BLOCKQUOTES */
+            [&_blockquote]:border-l-4 [&_blockquote]:border-brand-purple [&_blockquote]:pl-6 [&_blockquote]:italic [&_blockquote]:text-gray-500 [&_blockquote]:my-8
+            
+            /* IMAGES */
+            [&_img]:rounded-xl [&_img]:border [&_img]:border-gray-200 dark:[&_img]:border-gray-800 [&_img]:my-10 [&_img]:shadow-lg
+            ">
+            
+            {{ blog.body|markdown|safe }}
+        
+        </div>
+
+        <div class="mt-16 pt-8 border-t border-gray-200 dark:border-gray-800 flex flex-col md:flex-row items-center justify-between gap-6 transition-colors duration-300">
+            <div class="flex items-center gap-3">
+                <span class="text-xs font-mono text-gray-500 uppercase">Tags:</span>
+                <span class="px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-xs text-brand-purple dark:text-brand-cyan font-mono font-bold transition-colors">
+                    #{{ blog.category.name }}
+                </span>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <span class="text-xs font-mono text-gray-500 uppercase">Share_Packet:</span>
+                <button class="w-8 h-8 rounded bg-white dark:bg-gray-800 border border-gray-200 dark:border-transparent hover:bg-[#1DA1F2] hover:border-[#1DA1F2] hover:text-white flex items-center justify-center transition-all text-gray-400 shadow-sm"><i class="fa-brands fa-twitter"></i></button>
+                <button class="w-8 h-8 rounded bg-white dark:bg-gray-800 border border-gray-200 dark:border-transparent hover:bg-[#0077b5] hover:border-[#0077b5] hover:text-white flex items-center justify-center transition-all text-gray-400 shadow-sm"><i class="fa-brands fa-linkedin"></i></button>
+                <button class="w-8 h-8 rounded bg-white dark:bg-gray-800 border border-gray-200 dark:border-transparent hover:bg-brand-cyan hover:border-brand-cyan hover:text-black flex items-center justify-center transition-all text-gray-400 shadow-sm"><i class="fa-solid fa-link"></i></button>
+            </div>
+        </div>
+
+    </article>
+</div>
+
+<style>
+    /* Pygments Class Overrides for that "VS Code" look */
+    .dark .stackmart-prose .hll { background-color: #333 }
+    .dark .stackmart-prose .c { color: #6b7280; font-style: italic } /* Comment */
+    .dark .stackmart-prose .k { color: #ff79c6; font-weight: bold } /* Keyword */
+    .dark .stackmart-prose .o { color: #ff79c6 } /* Operator */
+    .dark .stackmart-prose .s { color: #f1fa8c } /* String */
+    .dark .stackmart-prose .s2 { color: #a78bfa } /* String Double - Light Purple */
+    .dark .stackmart-prose .nt { color: #ff79c6 } /* Name.Tag */
+    .dark .stackmart-prose .na { color: #50fa7b } /* Name.Attribute */
+</style>
+{% endblock %}

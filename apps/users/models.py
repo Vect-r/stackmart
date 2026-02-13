@@ -3,6 +3,8 @@ from apps.master.models import BaseClass
 import os
 from django.utils import timezone
 from django.utils.text import slugify
+from apps.master.utils.randomTokens import generate_id
+import math
 
 # Create your models here.
 
@@ -186,7 +188,7 @@ class ConnectionRequest(models.Model):
         return f"{self.sender} -> {self.receiver} ({self.status})"
     
 def blog_image_upload_path(instance, filename):
-    return os.path.join(f'blog_media/{instance.blog.id}/{filename}')
+    return os.path.join(f'blog_media/{instance.blog.id}/{generate_id()}{os.path.splitext(filename)[-1]}')
 
 def blog_cover_upload_path(instance,filename):
     return os.path.join(f"blog_media/{instance.id}/cover_photo.jpg")
@@ -226,6 +228,14 @@ class Blog(BaseClass):
     summary = models.CharField(max_length=200,null=True,blank=True)
     cover_image = models.ImageField(upload_to=blog_cover_upload_path, blank=True, null=True)
     status = models.CharField(max_length=100,choices= Status.choices, default=Status.DRAFT)
+
+    @property
+    def read_time(self):
+        # Average reading speed: 200 words per minute
+        word_count = len(self.body.split())
+        minutes = math.ceil(word_count / 200)
+        return minutes
+    
     
     class Meta:
         ordering = ['-created_at']

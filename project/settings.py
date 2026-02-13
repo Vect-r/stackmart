@@ -52,7 +52,7 @@ INSTALLED_APPS += [
 
 # THIRDPARTY_APPS
 INSTALLED_APPS += [
-    
+    'django_cleanup.apps.CleanupConfig',
 ]
 
 MIDDLEWARE = [
