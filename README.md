@@ -1,5 +1,4 @@
 ![image](static/logo.png) 
-# StackMart
 
 ## Setting up Mail Credentials
 
@@ -32,7 +31,7 @@ Note: For SSL, you would use EMAIL_PORT = 465 and EMAIL_USE_SSL = True with EMAI
 
 ## Running the Server.
 
-Before Running the server make sure you have configured Mail credentials in .env file as mentioned [here](#setting-up-mail-credentials-mail-header).
+Before Running the server make sure you have configured Mail credentials in .env file as mentioned [here](https://github.com/Vect-r/stackmart?tab=readme-ov-file#setting-up-mail-credentials).
 
 1. Clone The repo
 2. Create a Virtual Environment in current Directory
