@@ -56,7 +56,17 @@ INSTALLED_APPS += [
 INSTALLED_APPS += [
     'django_cleanup.apps.CleanupConfig',
     'rest_framework',
+    'django_filters',
 ]
+
+REST_FRAMEWORK = {
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+    "PAGE_SIZE": 10,  # default limit
+    "DEFAULT_FILTER_BACKENDS": [
+        "django_filters.rest_framework.DjangoFilterBackend",
+    ]
+}
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

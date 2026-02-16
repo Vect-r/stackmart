@@ -2,16 +2,20 @@ from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.viewsets import ModelViewSet
 from apps.users.models import Blog
 from .serializers import BlogListSerializer
+from rest_framework.response import Response
 
 class BlogPagination(LimitOffsetPagination):
     default_limit = 10
-    max_limit = 100
+    max_limit = 50
 
-class ProductViewSet(ModelViewSet):
-    queryset = Blog.objects.filter(status=Blog.STATUS.APPROVED)
-    serializer_class = BlogListSerializer
-    pagination_class = BlogPagination
-
+    def get_paginated_response(self, data):
+        return Response({
+            "meta": {
+                "count": len(data),        # items in this page
+                "total": self.count        # total items in queryset
+            },
+            "results": data
+        })
 
 # from rest_framework.pagination import PageNumberPagination
 # from rest_framework.response import Response
