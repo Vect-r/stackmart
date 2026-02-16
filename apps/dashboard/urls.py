@@ -25,7 +25,6 @@ urlpatterns = [
     path('blog/create/', blogCreate, name="blogCreate"),
     path('blog/edit/<uuid:blog_id>', blogCreate, name="blogEdit"),
     path('blog/<uuid:blog_id>', blogView, name="blogView"),
-    path('api/blog/<uuid:blog_id>/upload/',upload_blog_image,name="uploadBlogImage"),
     path('contact/', contact, name='contact'),
 ]
 

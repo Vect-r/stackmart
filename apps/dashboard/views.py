@@ -535,22 +535,6 @@ def accept_connection(request,sender_id):
 def blog(request):
     return render(request, "dashboard/blog.html")
 
-def upload_blog_image(request, blog_id):
-    if request.method == 'POST' and request.FILES.get('image'):
-        blog = get_object_or_404(Blog, id=blog_id, author=request.authenticated_user)
-        image_file = request.FILES['image']
-        
-        # Create the image object
-        blog_image = BlogImage.objects.create(blog=blog, image=image_file)
-        
-        # Return the URL to the frontend
-        return JsonResponse({
-            'status': 'success',
-            'url': blog_image.image.url,
-            'filename': image_file.name
-        })
-    return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
-
 @login_required_jwt
 def blogCreate(request,blog_id=None):
     if request.method=="POST" and blog_id:

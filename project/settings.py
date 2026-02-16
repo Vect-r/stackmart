@@ -48,12 +48,14 @@ INSTALLED_APPS += [
     'apps.master',
     'apps.dashboard',
     'apps.users',
-    'apps.chats'
+    'apps.chats',
+    'apps.api'
 ]
 
 # THIRDPARTY_APPS
 INSTALLED_APPS += [
     'django_cleanup.apps.CleanupConfig',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
