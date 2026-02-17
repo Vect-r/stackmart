@@ -10,6 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;600&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js"></script>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -132,7 +133,11 @@
                     <div class="ml-10 flex items-baseline space-x-4">
                         <a href="/" class="font-mono text-sm font-medium hover:text-brand-cyan transition-colors px-3 py-2 rounded-md">Browse</a>
                         <a href="#" class="font-mono text-sm font-medium hover:text-brand-cyan transition-colors px-3 py-2 rounded-md">Selling</a>
-                        <a href="{%url 'blog'%}" class="font-mono text-sm font-medium hover:text-brand-cyan transition-colors px-3 py-2 rounded-md">Blog</a>
+                        {%if request.isAuthenticated%}
+                        <a href="{%url 'userBlogs'%}" class="font-mono text-sm font-medium hover:text-brand-cyan transition-colors px-3 py-2 rounded-md">My Blogs</a>
+                        {%else%}
+                        <a href="{%url 'blog'%}" class="font-mono text-sm font-medium hover:text-brand-cyan transition-colors px-3 py-2 rounded-md">Blogs</a>
+                        {%endif%}
                         <a href="#" class="font-mono text-sm font-medium hover:text-brand-cyan transition-colors px-3 py-2 rounded-md">Community</a>
                         <a href="{% url 'about' %}" class="font-mono text-sm font-medium hover:text-brand-cyan transition-colors px-3 py-2 rounded-md">About Us</a>
                     </div>
@@ -284,7 +289,11 @@
         <div class="px-4 py-6 space-y-2 flex-grow overflow-y-auto">
             <a href="/" class="block px-4 py-3 rounded-lg text-base font-medium text-gray-300 hover:text-white hover:bg-white/5 font-mono transition-colors border-l-2 border-transparent hover:border-brand-cyan">Browse Hardware</a>
             <a href="#" class="block px-4 py-3 rounded-lg text-base font-medium text-gray-300 hover:text-white hover:bg-white/5 font-mono transition-colors border-l-2 border-transparent hover:border-brand-purple">Start Selling</a>
-            <a href="{% url 'blog' %}" class="block px-4 py-3 rounded-lg text-base font-medium text-gray-300 hover:text-white hover:bg-white/5 font-mono transition-colors border-l-2 border-transparent hover:border-brand-pink">DevLog (Blog)</a>
+            {%if request.isAuthenticated%}
+            <a href="{% url 'userBlogs' %}" class="block px-4 py-3 rounded-lg text-base font-medium text-gray-300 hover:text-white hover:bg-white/5 font-mono transition-colors border-l-2 border-transparent hover:border-brand-pink">My Blogs</a>
+            {%else%}
+            <a href="{% url 'blog' %}" class="block px-4 py-3 rounded-lg text-base font-medium text-gray-300 hover:text-white hover:bg-white/5 font-mono transition-colors border-l-2 border-transparent hover:border-brand-pink">Blogs</a>
+            {%endif%}
             <a href="{% url 'about' %}" class="block px-4 py-3 rounded-lg text-base font-medium text-gray-300 hover:text-white hover:bg-white/5 font-mono transition-colors border-l-2 border-transparent hover:border-white">About Us</a>
             <a href="{% url 'contact' %}" class="block px-4 py-3 rounded-lg text-base font-medium text-gray-300 hover:text-white hover:bg-white/5 font-mono transition-colors border-l-2 border-transparent hover:border-white">Contact</a>
         </div>

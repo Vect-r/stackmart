@@ -1,0 +1,110 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}My Blogs | Stackmart{% endblock %}
+
+{% block content %}
+<div class="min-h-screen pb-20 pt-12 px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-transparent">
+
+    <div class="max-w-7xl mx-auto mb-10">
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div>
+                <h1 class="text-3xl font-bold font-mono text-gray-900 dark:text-white mb-2">
+                    MyBlogs<span class="text-brand-cyan">()</span>
+                </h1>
+                <p class="text-gray-500 text-sm">Manage, edit, and track the status of your publications.</p>
+            </div>
+
+            <div class="flex items-center gap-4 w-full md:w-auto">
+                <div class="relative group flex-1 md:w-64">
+                    <i
+                        class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-brand-purple transition-colors"></i>
+                    <input type="text" name="title" placeholder="Search title..."
+                        class="w-full bg-white dark:bg-[#18181b] border border-gray-300 dark:border-gray-700 rounded-lg py-2 pl-9 pr-4 text-sm text-gray-900 dark:text-white focus:border-brand-purple focus:ring-1 focus:ring-brand-purple outline-none transition-all"
+                        hx-get="{% url 'userBlogs' %}" hx-trigger="keyup changed delay:500ms, search"
+                        hx-target="#my-blog-grid" hx-include="[name='status']">
+                </div>
+
+                <a href="{% url 'blogCreate' %}" class="font-mono px-4 py-2 bg-gradient-to-r from-brand-cyan to-brand-purple text-white hover:bg-brand-purple/90 text-white text-sm font-bold rounded-lg shadow-lg shadow-brand-purple/20 transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-plus"></i> New Blog
+                </a>
+
+                <!-- <a href="{% url 'blogCreate'%}" class="block text-center w-full py-3 bg-gradient-to-r from-brand-cyan to-brand-purple text-white font-bold font-mono rounded-lg shadow-lg shadow-brand-purple/20 
+          border-b-4 border-brand-purple active:border-b-0 active:translate-y-1 transition-all">Create
+
+                </a> -->
+            </div>
+        </div>
+
+        <div class="flex gap-2 mt-8 overflow-x-auto pb-2 custom-scrollbar border-b border-gray-200 dark:border-gray-800"
+            id="status-filters">
+            <input type="hidden" name="status" value="all" id="status-input">
+
+            {% with current=current_status|default:"all" %}
+
+            <button onclick="setStatus('all', this)"
+                class="px-4 py-2 rounded-t-lg border-b-2 text-sm font-mono font-bold transition-all whitespace-nowrap
+                {% if current == 'all' %} border-brand-purple text-brand-purple bg-brand-purple/5 {% else %} border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 {% endif %}"
+                hx-get="{% url 'userBlogs' %}" hx-vals='{"status": "all"}' hx-target="#my-blog-grid">
+                All Logs
+            </button>
+
+            <button onclick="setStatus('draft', this)"
+                class="px-4 py-2 rounded-t-lg border-b-2 text-sm font-mono font-bold transition-all whitespace-nowrap
+                {% if current == 'draft' %} border-yellow-500 text-yellow-600 bg-yellow-500/5 {% else %} border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 {% endif %}"
+                hx-get="{% url 'userBlogs' %}" hx-vals='{"status": "draft"}' hx-target="#my-blog-grid">
+                Drafts
+            </button>
+
+            <button onclick="setStatus('submitted', this)"
+                class="px-4 py-2 rounded-t-lg border-b-2 text-sm font-mono font-bold transition-all whitespace-nowrap
+                {% if current == 'submitted' %} border-blue-500 text-blue-500 bg-blue-500/5 {% else %} border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 {% endif %}"
+                hx-get="{% url 'userBlogs' %}" hx-vals='{"status": "submitted"}' hx-target="#my-blog-grid">
+                In Review
+            </button>
+
+            <button onclick="setStatus('approved', this)"
+                class="px-4 py-2 rounded-t-lg border-b-2 text-sm font-mono font-bold transition-all whitespace-nowrap
+                {% if current == 'approved' %} border-green-500 text-green-500 bg-green-500/5 {% else %} border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 {% endif %}"
+                hx-get="{% url 'userBlogs' %}" hx-vals='{"status": "approved"}' hx-target="#my-blog-grid">
+                Published
+            </button>
+
+            <button onclick="setStatus('rejected', this)"
+                class="px-4 py-2 rounded-t-lg border-b-2 text-sm font-mono font-bold transition-all whitespace-nowrap
+                {% if current == 'rejected' %} border-red-500 text-red-500 bg-red-500/5 {% else %} border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 {% endif %}"
+                hx-get="{% url 'userBlogs' %}" hx-vals='{"status": "rejected"}' hx-target="#my-blog-grid">
+                Rejected
+            </button>
+            {% endwith %}
+        </div>
+    </div>
+
+    <div id="my-blog-grid" class="max-w-7xl mx-auto">
+        {% include 'dashboard/partials/userBlogs_results.html' %}
+    </div>
+
+</div>
+
+<script>
+    function setStatus(status, btn) {
+        // Update hidden input for search bar to use
+        document.getElementById('status-input').value = status;
+
+        // Reset all buttons visual state (Simple removal of active classes)
+        const buttons = document.querySelectorAll('#status-filters button');
+        buttons.forEach(b => {
+            b.className = "px-4 py-2 rounded-t-lg border-b-2 text-sm font-mono font-bold transition-all whitespace-nowrap border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300";
+        });
+
+        // Apply active style based on status type
+        let activeClass = "border-brand-purple text-brand-purple bg-brand-purple/5"; // Default
+        if (status === 'draft') activeClass = "border-yellow-500 text-yellow-600 bg-yellow-500/5";
+        if (status === 'submitted') activeClass = "border-blue-500 text-blue-500 bg-blue-500/5";
+        if (status === 'approved') activeClass = "border-green-500 text-green-500 bg-green-500/5";
+        if (status === 'rejected') activeClass = "border-red-500 text-red-500 bg-red-500/5";
+
+        btn.className = `px-4 py-2 rounded-t-lg border-b-2 text-sm font-mono font-bold transition-all whitespace-nowrap ${activeClass}`;
+    }
+</script>
+{% endblock %}

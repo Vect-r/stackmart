@@ -22,6 +22,8 @@ from django.core import serializers
 from apps.users.services import *
 from django.http import Http404
 import os
+from apps.api.filters import BlogFilter, UserBlogFilter
+from django.core.paginator import Paginator
 
 
 mailObj = MailSender()
@@ -533,7 +535,67 @@ def accept_connection(request,sender_id):
     return redirect('connections')
 
 def blog(request):
-    return render(request, "dashboard/blog.html")
+    #Gets the data from query set
+    queryset = Blog.objects.all().order_by('-created_at')
+    
+    #Appending to filter set
+    filter_set = BlogFilter(request.GET, queryset=queryset)
+    
+    
+    paginator = Paginator(filter_set.qs, 4) # 9 items per page
+    page_number = request.GET.get('page') or 1
+    page_obj = paginator.get_page(page_number)
+    
+    elided_page_range = paginator.get_elided_page_range(page_number, on_each_side=1, on_ends=1)
+
+    context = {
+        'page_obj': page_obj,
+        'filter': filter_set,
+        'elided_page_range': elided_page_range, # <--- Pass this to template
+    }
+
+    context['categories'] = BlogCategory.objects.all()
+
+    if request.headers.get('HX-Request'):
+        return render(request, 'dashboard/partials/blog_results.html', context)
+        
+    return render(request, 'dashboard/blog_list.html', context)
+    # return render(request, "dashboard/blog.html")
+
+@login_required_jwt
+def userBlogs(request):
+    # 1. Base Query: Get ONLY the logged-in user's blogs
+    queryset = Blog.objects.filter(author=request.authenticated_user).order_by('-created_at')
+
+    # # 2. Search Filter (Title)
+    search_query = request.GET.get('title', '')
+    # if search_query:
+    #     queryset = queryset.filter(title__icontains=search_query)
+
+    # # 3. Status Filter
+    status_filter = request.GET.get('status', '')
+    # if status_filter and status_filter != 'all':
+    #     queryset = queryset.filter(status=status_filter)
+
+    filter_set = UserBlogFilter(request.GET, queryset=queryset)
+
+    # 4. Pagination
+    paginator = Paginator(filter_set.qs, 9)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'page_obj': page_obj,
+        'current_status': status_filter or 'all',
+        'search_query': search_query,
+    }
+
+    # HTMX Request: Return only the grid
+    if request.headers.get('HX-Request'):
+        return render(request, 'dashboard/partials/userBlogs_results.html', context)
+
+    # Full Page Load
+    return render(request, 'dashboard/userBlogs.html', context)
 
 @login_required_jwt
 def blogCreate(request,blog_id=None):
@@ -547,6 +609,8 @@ def blogCreate(request,blog_id=None):
                 blog_obj.status = Blog.Status.SUBMITTED
 
             blog_obj.save()
+            messages.success(request,"Saved as Draft.")
+            return redirect('userBlogs')
         else:
             print(form.errors)
 
@@ -555,6 +619,8 @@ def blogCreate(request,blog_id=None):
     if blog_id is None:
         blog=Blog.objects.create(author=request.authenticated_user)
         return redirect('blogEdit',blog_id=blog.id)
+        
+    
 
     context['categories'] = BlogCategory.objects.all()
     context['blog']= get_object_or_404(Blog,id=blog_id,author=request.authenticated_user,status="draft")
@@ -565,6 +631,10 @@ def blogView(request,blog_id):
     context={}
     context['blog'] = get_object_or_404(Blog,id=blog_id,status='draft')
     return render(request,'dashboard/blog_view.html',context)
+
+@login_required_jwt
+def blogPreview(request,blog_id):
+    return blogView(request,blog_id)
 
 @login_required_jwt
 def chatsView(request,viewer=None):

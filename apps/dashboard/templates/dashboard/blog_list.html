@@ -1,0 +1,175 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Blogs | Stackmart{% endblock %}
+
+{% block content %}
+<div class="min-h-screen pb-20 pt-12 px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-transparent">
+
+    <div class="max-w-7xl mx-auto mb-12">
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+
+            <div>
+                <h1 class="text-4xl font-extrabold font-mono text-gray-900 dark:text-white mb-2">
+                    /var/log<span class="text-brand-purple">/all</span>
+                </h1>
+                <p class="text-gray-500 font-mono text-sm">
+                    Searching <span class="text-brand-cyan">{{ page_obj.paginator.count }}</span> entries...
+                </p>
+            </div>
+
+            <div class="w-full md:w-96 relative group z-10">
+
+                <div class="absolute right-3 top-1/2 -translate-y-1/2 text-brand-purple htmx-indicator transition-all"
+                    id="search-loader">
+                    <i class="fa-solid fa-circle-notch fa-spin"></i>
+                </div>
+
+                <i
+                    class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-brand-cyan transition-colors pointer-events-none"></i>
+
+                <input type="text" id="search-input" name="title" placeholder="Search Blogs via title..."
+                    class="w-full bg-white dark:bg-[#18181b] border border-gray-300 dark:border-gray-700 rounded-xl py-3 pl-11 pr-10 text-sm font-mono text-gray-900 dark:text-white focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan outline-none transition-all shadow-lg dark:shadow-none peer"
+                    hx-get="{% url 'blog' %}" hx-trigger="keyup changed delay:500ms, search"
+                    hx-target="#blog-results" hx-indicator="#search-loader" value="{{ request.GET.title|default:'' }}"
+                    autocomplete="off" oninput="toggleReset(this)">
+
+                <button type="button" id="reset-btn" onclick="resetSearch()"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-500 hover:text-red-500 hover:bg-gray-300 dark:hover:bg-gray-600 flex items-center justify-center transition-all opacity-0 pointer-events-none scale-90"
+                    title="Clear Search">
+                    <i class="fa-solid fa-xmark text-xs"></i>
+                </button>
+            </div>
+
+            <script>
+                function toggleReset(input) {
+                    const btn = document.getElementById('reset-btn');
+                    const loader = document.getElementById('search-loader');
+
+                    if (input.value.length > 0) {
+                        // Show Reset Button, Hide Loader (unless htmx is running)
+                        btn.classList.remove('opacity-0', 'pointer-events-none', 'scale-90');
+                        loader.classList.add('opacity-0'); // Hide loader spot to prevent overlap
+                    } else {
+                        // Hide Reset Button
+                        btn.classList.add('opacity-0', 'pointer-events-none', 'scale-90');
+                        loader.classList.remove('opacity-0');
+                    }
+                }
+
+                function resetSearch() {
+                    const input = document.getElementById('search-input');
+                    const btn = document.getElementById('reset-btn');
+
+                    // 1. Clear Value
+                    input.value = '';
+
+                    // 2. Hide Button
+                    btn.classList.add('opacity-0', 'pointer-events-none', 'scale-90');
+
+                    // 3. Focus Input (UX best practice)
+                    input.focus();
+
+                    // 4. Trigger HTMX to reload the "All Posts" list
+                    htmx.trigger(input, 'keyup');
+                }
+
+                // Initialize button state on page load (in case user refreshes with search query)
+                document.addEventListener("DOMContentLoaded", function () {
+                    toggleReset(document.getElementById('search-input'));
+                });
+            </script>
+
+            <style>
+                /* Ensure loader shows when HTMX is busy, overriding our JS toggle */
+                .htmx-request .htmx-indicator {
+                    display: block !important;
+                    opacity: 1 !important;
+                }
+
+                .htmx-request+#search-input+#reset-btn {
+                    display: none;
+                }
+
+                /* Hide X when loading */
+            </style>
+        </div>
+
+        <div class="flex gap-2 mt-6 overflow-x-auto pb-2 custom-scrollbar" id="category-filters">
+    
+    <button onclick="setActiveCategory(this)"
+            class="px-4 py-1.5 rounded-full border text-xs font-mono transition-all whitespace-nowrap
+            {% if not request.GET.category %}
+                bg-brand-purple text-white border-brand-purple
+            {% else %}
+                bg-white dark:bg-[#18181b] border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-brand-purple hover:text-brand-purple
+            {% endif %}"
+            hx-get="{% url 'blog' %}" 
+            hx-vals='{"category": ""}' 
+            hx-include="[name='title']"
+            hx-target="#blog-results">
+        All
+    </button>
+
+    {% for cat in categories %}
+    <button onclick="setActiveCategory(this)"
+            class="px-4 py-1.5 rounded-full border text-xs font-mono transition-all whitespace-nowrap
+            {% if request.GET.category == cat.slug %}
+                bg-brand-purple text-white border-brand-purple
+            {% else %}
+                bg-white dark:bg-[#18181b] border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-brand-purple hover:text-brand-purple
+            {% endif %}"
+            hx-get="{% url 'blog' %}" 
+            hx-vals='{"category": "{{ cat.slug }}"}' 
+            hx-include="[name='title']"
+            hx-target="#blog-results">
+        {{ cat.name }}
+    </button>
+    {% endfor %}
+</div>
+
+<script>
+    function setActiveCategory(btn) {
+        // 1. Get all buttons in the container
+        const buttons = document.querySelectorAll('#category-filters button');
+        
+        // 2. Loop through and reset them to "Inactive" style
+        buttons.forEach(b => {
+            // Remove Active Classes
+            b.classList.remove('bg-brand-purple', 'text-white', 'border-brand-purple');
+            
+            // Add Inactive Classes
+            b.classList.add('bg-white', 'dark:bg-[#18181b]', 'border-gray-300', 'dark:border-gray-700', 'text-gray-600', 'dark:text-gray-400');
+        });
+
+        // 3. Set "Active" style for the clicked button
+        // Remove Inactive Classes
+        btn.classList.remove('bg-white', 'dark:bg-[#18181b]', 'border-gray-300', 'dark:border-gray-700', 'text-gray-600', 'dark:text-gray-400');
+        
+        // Add Active Classes
+        btn.classList.add('bg-brand-purple', 'text-white', 'border-brand-purple');
+    }
+</script>
+    </div>
+
+    <div id="blog-results" class="max-w-7xl mx-auto">
+        {% include 'dashboard/partials/blog_results.html' %}
+    </div>
+
+</div>
+
+<style>
+    /* HTMX Loading Indicator Logic */
+    .htmx-indicator {
+        display: none;
+    }
+
+    .htmx-request .htmx-indicator {
+        display: block;
+    }
+
+    .htmx-request.htmx-indicator {
+        display: block;
+    }
+</style>
+{% endblock %}

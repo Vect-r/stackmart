@@ -14,6 +14,8 @@ from apps.users.models import Blog, BlogImage
 from .serializers import BlogListSerializer
 from .pagination import *
 from .filters import BlogFilter
+
+from apps.master.auth.utils import login_required_jwt
 # Create your views here.
 
 @api_view(['GET'])
@@ -38,6 +40,15 @@ class BlogListView(ListAPIView):
 
     filter_backends = [DjangoFilterBackend]
     filterset_class = BlogFilter
+
+@api_view(['DELETE'])
+@login_required_jwt
+def delete_blog_image(request,pk_id):
+    if request.method=="DELETE":
+        # image_url =request.query_params.get('image_url').lstrip('/media')
+        get_image = get_object_or_404(BlogImage,pk=pk_id,blog__author=request.authenticated_user)
+        get_image.delete()
+        return Response({'message':'Deleted!!!'}, status=status.HTTP_200_OK)
     
 
 def upload_blog_image(request, blog_id):
@@ -52,7 +63,10 @@ def upload_blog_image(request, blog_id):
         return JsonResponse({
             'status': 'success',
             'url': blog_image.image.url,
+            'pk_id': blog_image.pk,
             'filename': image_file.name
         })
     return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
+
+
 

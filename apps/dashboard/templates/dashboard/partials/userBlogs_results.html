@@ -1,0 +1,111 @@
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in-up">
+    
+    {% for blog in page_obj %}
+    <div class="bg-white dark:bg-[#131316] border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden flex flex-col group hover:border-brand-purple/50 transition-all duration-300 hover:shadow-2xl hover:shadow-brand-purple/10">
+        
+        <div class="h-48 overflow-hidden relative bg-gray-100 dark:bg-gray-800 group">
+            {% if blog.cover_image %}
+                <img src="{{ blog.cover_image.url }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+            {% else %}
+                <div class="w-full h-full flex items-center justify-center bg-[#09090b]">
+                    <i class="fa-solid fa-code text-4xl text-gray-700"></i>
+                </div>
+            {% endif %}
+
+            <div class="absolute top-3 right-3 backdrop-blur-md px-3 py-1 rounded-lg border shadow-sm text-[10px] font-mono font-bold uppercase tracking-wider
+                {% if blog.status == 'draft' %} 
+                    bg-yellow-500/10 text-yellow-500 border-yellow-500/50 
+                {% elif blog.status == 'submitted' %} 
+                    bg-brand-cyan/10 text-brand-cyan border-brand-cyan/50 
+                {% elif blog.status == 'approved' %} 
+                    bg-green-500/10 text-green-500 border-green-500/50 
+                {% elif blog.status == 'rejected' %} 
+                    bg-brand-pink/10 text-brand-pink border-brand-pink/50 
+                {% endif %}">
+                
+                {% if blog.status == 'draft' %}<i class="fa-solid fa-pen-ruler mr-1"></i>
+                {% elif blog.status == 'submitted' %}<i class="fa-solid fa-clock mr-1"></i>
+                {% elif blog.status == 'approved' %}<i class="fa-solid fa-check mr-1"></i>
+                {% elif blog.status == 'rejected' %}<i class="fa-solid fa-xmark mr-1"></i>
+                {% endif %}
+                
+                {{ blog.get_status_display }}
+            </div>
+        </div>
+
+        <div class="p-6 flex flex-col flex-1">
+            <div class="flex items-center justify-between mb-3 text-xs font-mono text-gray-500">
+                <span class="text-brand-purple">{{ blog.created_at|date:"M d, Y" }}</span>
+                {% if blog.category %}
+                <span class="px-2 py-0.5 rounded border border-gray-700 text-gray-400">#{{ blog.category.name }}</span>
+                {% endif %}
+            </div>
+            
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white font-mono leading-tight mb-3 line-clamp-1 group-hover:text-brand-cyan transition-colors">
+                {{ blog.title|default:"Untitled Draft" }}
+            </h3>
+            
+            <p class="text-sm text-gray-500 dark:text-gray-400 line-clamp-2 mb-6 flex-1">
+                {{ blog.summary|default:"No summary provided..." }}
+            </p>
+
+            <div class="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-800 mt-auto">
+                
+                <a href="{% if blog.status == 'approved' %}{% url 'blog_detail' blog.slug %}{% else %}#{% endif %}" 
+                   class="text-xs font-bold font-mono text-gray-500 hover:text-brand-purple transition-colors flex items-center gap-1.5 
+                   {% if blog.status != 'approved' %}cursor-not-allowed opacity-50{% endif %}">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i> Preview
+                </a>
+
+                <div class="flex items-center gap-2">
+                    {% if blog.status == 'draft' or blog.status == 'rejected' %}
+                    <a href="{% url 'blogEdit' blog.id %}" 
+                       class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-[#18181b] border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-brand-purple hover:text-brand-purple hover:shadow-[0_0_10px_rgba(121,40,202,0.3)] flex items-center justify-center transition-all" 
+                       title="Edit Log">
+                        <i class="fa-solid fa-pen-to-square text-xs"></i>
+                    </a>
+                    {% endif %}
+
+                    <button class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-[#18181b] border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-brand-pink hover:text-brand-pink hover:shadow-[0_0_10px_rgba(255,0,128,0.3)] flex items-center justify-center transition-all" 
+                            title="Delete Log">
+                        <i class="fa-regular fa-trash-can text-xs"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-span-full py-20 text-center border border-dashed border-gray-300 dark:border-gray-800 rounded-2xl bg-gray-50/50 dark:bg-[#131316]/50">
+        <div class="w-16 h-16 bg-gray-200 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400">
+            <i class="fa-solid fa-ghost text-2xl"></i>
+        </div>
+        <h3 class="text-gray-900 dark:text-white font-bold text-lg font-mono">No logs found</h3>
+        <p class="text-gray-500 text-sm mt-1 font-mono">
+            /var/log/{{ current_status }} is empty.
+        </p>
+    </div>
+    {% endfor %}
+
+</div>
+
+{% if page_obj.has_other_pages %}
+<div class="mt-10 flex justify-center">
+    <div class="flex items-center gap-2">
+        {% if page_obj.has_previous %}
+        <button class="w-9 h-9 rounded-lg border border-gray-300 dark:border-gray-700 flex items-center justify-center text-gray-500 hover:text-brand-cyan hover:border-brand-cyan transition-all"
+            hx-get="?page={{ page_obj.previous_page_number }}" hx-target="#my-blog-grid" hx-include="[name='search'], [name='status']">
+            <i class="fa-solid fa-chevron-left text-xs"></i>
+        </button>
+        {% endif %}
+        
+        <span class="px-3 text-xs font-mono text-gray-500 font-bold">Page {{ page_obj.number }}</span>
+
+        {% if page_obj.has_next %}
+        <button class="w-9 h-9 rounded-lg border border-gray-300 dark:border-gray-700 flex items-center justify-center text-gray-500 hover:text-brand-cyan hover:border-brand-cyan transition-all"
+            hx-get="?page={{ page_obj.next_page_number }}" hx-target="#my-blog-grid" hx-include="[name='search'], [name='status']">
+            <i class="fa-solid fa-chevron-right text-xs"></i>
+        </button>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
