@@ -13,7 +13,7 @@ from datetime import datetime, timedelta, UTC
 from apps.users.forms import PasswordResetForm, BlogForm
 from .mailings import MailSender
 from django.views.decorators.http import require_POST
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 import json
 from django.utils import timezone
 from django.db import transaction, IntegrityError
@@ -607,10 +607,19 @@ def blogCreate(request,blog_id=None):
             action = request.POST.get("status")
             if action == "submitted":
                 blog_obj.status = Blog.Status.SUBMITTED
-
             blog_obj.save()
-            messages.success(request,"Saved as Draft.")
-            return redirect('userBlogs')
+            if request.POST.get('action') == 'auto_save':
+                current_time = blog_obj.updated_at.strftime("%I:%M:%S %p %Z")
+                # Return JUST the status badge HTML
+                return HttpResponse(f'''
+                    <span class="flex items-center gap-2 text-green-500 animate-pulse transition-all duration-500">
+                        <i class="fa-solid fa-check"></i> 
+                        Auto-saved at {current_time}
+                    </span>
+                ''')
+            else:
+                messages.success(request,"Saved as Draft.")
+                return redirect('userBlogs')
         else:
             print(form.errors)
 
@@ -625,14 +634,14 @@ def blogCreate(request,blog_id=None):
     return render(request,'dashboard/blog_create.html',context)
 
 
-def blogView(request,blog_id):
+def blogView(request,blog_id,status='approved'):
     context={}
-    context['blog'] = get_object_or_404(Blog,id=blog_id,status='approved')
+    context['blog'] = get_object_or_404(Blog,id=blog_id,status=status)
     return render(request,'dashboard/blog_view.html',context)
 
 @login_required_jwt
 def blogPreview(request,blog_id):
-    return blogView(request,blog_id)
+    return blogView(request,blog_id,status='draft')
 
 @login_required_jwt
 def chatsView(request,viewer=None):

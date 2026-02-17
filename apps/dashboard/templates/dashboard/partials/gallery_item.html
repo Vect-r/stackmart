@@ -1,0 +1,55 @@
+<div class="bg-white dark:bg-[#18181b] p-6 rounded-xl border border-gray-300 dark:border-gray-700 shadow-lg shadow-black/5">
+    <div class="flex items-center justify-between mb-3">
+        <label class="block text-xs font-bold font-mono uppercase text-gray-500">Media Library</label>
+        <span class="text-[10px] text-brand-cyan font-mono bg-brand-cyan/10 px-2 py-0.5 rounded">Auto-Save</span>
+    </div>
+    
+    <div class="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-6 text-center hover:border-brand-purple hover:bg-brand-purple/5 transition-all cursor-pointer group" 
+         onclick="document.getElementById('htmx-image-input').click()">
+        <i class="fa-solid fa-cloud-arrow-up text-3xl text-gray-400 group-hover:text-brand-purple mb-2 transition-colors"></i>
+        <p class="text-xs text-gray-500 font-mono group-hover:text-gray-400">Click to upload image</p>
+        
+        <input type="file" 
+               id="htmx-image-input" 
+               name="image" 
+               class="hidden" 
+               accept="image/*"
+               hx-post="{% url 'upload_blog_image' blog.id %}"
+               hx-encoding="multipart/form-data"
+               hx-target="#image-gallery"
+               hx-swap="afterbegin"
+               hx-trigger="change"
+               hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+               hx-indicator="#upload-indicator">
+    </div>
+
+    <div id="upload-indicator" class="htmx-indicator w-full h-1 bg-gray-200 mt-2 overflow-hidden rounded-full">
+        <div class="h-full bg-brand-purple animate-pulse w-1/2 mx-auto"></div>
+    </div>
+
+    <div id="image-gallery" class="grid grid-cols-2 gap-2 mt-4 max-h-60 overflow-y-auto pr-1 custom-scrollbar">
+        {% for img in blog.images.all %}
+        <div class="relative group rounded-lg overflow-hidden border border-gray-700 h-20 bg-black transition-all">
+            <img src="{{ img.image.url }}" class="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity">
+            
+            <button type="button" onclick="insertMarkdown('![Image]({{ img.image.url }})', '')" 
+                class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-[1px] z-10">
+                <span class="text-white text-[10px] font-mono font-bold border border-white/50 px-2 py-1 rounded hover:bg-white/20">
+                    <i class="fa-solid fa-plus mr-1"></i> INSERT
+                </span>
+            </button>
+
+            <button type="button"
+                class="absolute top-1 right-1 z-20 w-6 h-6 rounded bg-red-500/80 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600 shadow-sm"
+                hx-post="{% url 'deleteBlogImage' %}"
+                hx-vals='{"image_url": "{{ img.image.url }}"}'
+                hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
+                hx-target="closest .relative"
+                hx-swap="outerHTML"
+                hx-confirm="Delete image?">
+                <i class="fa-solid fa-trash text-[10px]"></i>
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+</div>
