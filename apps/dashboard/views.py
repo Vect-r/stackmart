@@ -536,7 +536,7 @@ def accept_connection(request,sender_id):
 
 def blog(request):
     #Gets the data from query set
-    queryset = Blog.objects.all().order_by('-created_at')
+    queryset = Blog.objects.filter(status="approved").order_by('-created_at')
     
     #Appending to filter set
     filter_set = BlogFilter(request.GET, queryset=queryset)
@@ -620,8 +620,6 @@ def blogCreate(request,blog_id=None):
         blog=Blog.objects.create(author=request.authenticated_user)
         return redirect('blogEdit',blog_id=blog.id)
         
-    
-
     context['categories'] = BlogCategory.objects.all()
     context['blog']= get_object_or_404(Blog,id=blog_id,author=request.authenticated_user,status="draft")
     return render(request,'dashboard/blog_create.html',context)
@@ -629,7 +627,7 @@ def blogCreate(request,blog_id=None):
 
 def blogView(request,blog_id):
     context={}
-    context['blog'] = get_object_or_404(Blog,id=blog_id,status='draft')
+    context['blog'] = get_object_or_404(Blog,id=blog_id,status='approved')
     return render(request,'dashboard/blog_view.html',context)
 
 @login_required_jwt
@@ -638,6 +636,6 @@ def blogPreview(request,blog_id):
 
 @login_required_jwt
 def chatsView(request,viewer=None):
-    if viewer=="gemini":
-        return render(request, 'dashboard/chat-demo-gemini.html')    
+    if viewer=="v2":
+        return render(request, 'dashboard/chat-demo-v2.html')    
     return render(request, 'dashboard/chat-demo.html')

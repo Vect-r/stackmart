@@ -3,6 +3,9 @@ from django.http import JsonResponse
 from rest_framework.request import Request
 from apps.api.views import BlogListView
 
+#For testing purpose only.
+#This will be deprecated in future and deleted.
+
 def blog_list(request):
     drf_request = Request(request)  # 🔥 wrap it
 

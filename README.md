@@ -45,4 +45,4 @@ Before Running the server make sure you have configured Mail credentials in .env
    `yu.bat`
 
    For Linux/MacOS
-   `python manage.py runserver 0.0.0.0:9060`
+   `chmod +x yu.sh && ./yu.sh`
