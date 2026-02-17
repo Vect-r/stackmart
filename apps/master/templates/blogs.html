@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Blogs</title>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <style>
+        body { font-family: Arial; max-width: 900px; margin: auto; padding: 20px; }
+        .filters input, .filters select { margin: 5px; padding: 6px; }
+        .blog { border-bottom: 1px solid #ddd; padding: 10px 0; }
+        .pagination button { margin: 5px; padding: 6px 10px; cursor: pointer; }
+        .htmx-indicator { display: none; }
+        .htmx-request .htmx-indicator { display: inline; }
+    </style>
+</head>
+<body>
+
+<h1>Blog Search</h1>
+
+<!-- 🔍 Filters -->
+<div class="filters">
+    <input type="text" name="title" placeholder="Search title..."
+           hx-get="{% url 'blog_list' %}"
+           hx-trigger="keyup changed delay:400ms"
+           hx-target="#blog-results"
+           hx-include=".filters input, .filters select"
+           hx-push-url="true" />
+
+    <select name="category"
+            hx-get="{% url 'blog_list' %}"
+            hx-trigger="change"
+            hx-target="#blog-results"
+            hx-include=".filters input, .filters select"
+            hx-push-url="true">
+        <option value="">All Categories</option>
+        <option value="ai">AI</option>
+        <option value="ml">ML</option>
+    </select>
+
+    <input type="text" name="author" placeholder="Author..."
+           hx-get="{% url 'blog_list' %}"
+           hx-trigger="keyup changed delay:400ms"
+           hx-target="#blog-results"
+           hx-include=".filters input, .filters select"
+           hx-push-url="true" />
+
+    <span class="htmx-indicator">🔄 Searching...</span>
+</div>
+
+<hr>
+
+<!-- 📦 Results Container -->
+<div id="blog-results">
+    {% include "partials/blog_list.html" %}
+</div>
+
+</body>
+</html>

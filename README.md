@@ -1,4 +1,4 @@
-![image](static/logo.png) 
+![image](static/logo.png)
 
 ## Setting up Mail Credentials
 
@@ -27,18 +27,19 @@ EMAIL_HOST_PASSWORD = 'your-app-password' # Replace with the generated App Passw
 DEFAULT_FROM_EMAIL = 'your-email@gmail.com' # Optional: default sender email
 ```
 
-Note: For SSL, you would use EMAIL_PORT = 465 and EMAIL_USE_SSL = True with EMAIL_USE_TLS = False
+Note: For SSL, you would use `EMAIL_PORT = 465` and `EMAIL_USE_SSL = True` with `EMAIL_USE_TLS = False`
 
-## Running the Server.
+## Running Server.
 
 Before Running the server make sure you have configured Mail credentials in .env file as mentioned [here](https://github.com/Vect-r/stackmart?tab=readme-ov-file#setting-up-mail-credentials).
 
-1. Clone The repo
+1. Clone the repository
 2. Create a Virtual Environment in current Directory
    `python -m venv .venv`
 3. Install Project's Requirements
    `pip install -r requirements.txt`
-4. Run the Server.
+4. Activate Virtual Environment
+5. Run the Server.
 
    For Windows
    `yu.bat`

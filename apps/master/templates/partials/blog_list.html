@@ -1,0 +1,47 @@
+<div>
+    <p><strong>Total Blogs:</strong> {{ meta.count }}</p>
+
+    {% for blog in results %}
+        <div class="blog">
+            <h3>{{ blog.title }}</h3>
+            <p>
+                Category: {{ blog.category.name }} |
+                Author: {{ blog.author.username }}
+            </p>
+            <small>{{ blog.created_at }}</small>
+        </div>
+    {% empty %}
+        <p>No blogs found.</p>
+    {% endfor %}
+</div>
+
+<!-- 🔢 Pagination -->
+<div class="pagination">
+    {% if pagination.previous %}
+        <button hx-get="{{ pagination.previous|cut:request.build_absolute_uri|default:'' }}"
+                hx-target="#blog-results"
+                hx-include=".filters input, .filters select"
+                hx-push-url="true">
+            ⬅ Prev
+        </button>
+    {% endif %}
+
+    {% for page in pagination.page_range %}
+        <button hx-get="?page={{ page }}"
+                hx-target="#blog-results"
+                hx-include=".filters input, .filters select"
+                hx-push-url="true"
+                {% if page == pagination.current %}style="font-weight:bold"{% endif %}>
+            {{ page }}
+        </button>
+    {% endfor %}
+
+    {% if pagination.next %}
+        <button hx-get="{{ pagination.next|cut:request.build_absolute_uri|default:'' }}"
+                hx-target="#blog-results"
+                hx-include=".filters input, .filters select"
+                hx-push-url="true">
+            Next ➡
+        </button>
+    {% endif %}
+</div>

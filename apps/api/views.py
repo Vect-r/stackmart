@@ -12,7 +12,7 @@ from django.http import JsonResponse
 from apps.users.models import Blog, BlogImage
 
 from .serializers import BlogListSerializer
-from .pagination import BlogPagination
+from .pagination import *
 from .filters import BlogFilter
 # Create your views here.
 
@@ -33,7 +33,8 @@ def getCurrentUserSubmittedBlogs(request):
 class BlogListView(ListAPIView):
     queryset = Blog.objects.all().order_by('created_at')
     serializer_class = BlogListSerializer
-    pagination_class = BlogPagination
+    # pagination_class = BlogPagination
+    pagination_class = ElidedPageNumberPagination
 
     filter_backends = [DjangoFilterBackend]
     filterset_class = BlogFilter

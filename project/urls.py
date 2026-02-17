@@ -25,4 +25,5 @@ urlpatterns = [
     path('', include('apps.dashboard.urls')),
     path('chats/', include('apps.chats.urls')),
     path('api/',include('apps.api.urls')),
+    path('demo/',include('apps.master.urls')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
