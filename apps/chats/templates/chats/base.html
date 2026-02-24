@@ -8,7 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js" integrity="sha384-/TgkGk7p307TH7EXJDuUlgG3Ce1UVolAOFopFekQkkXihi5u/6OCvVKyz1W+idaz" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/htmx-ext-ws@2.0.4" integrity="sha384-1RwI/nvUSrMRuNj7hX1+27J8XDdCoSLf0EjEyF69nacuWyiJYoQ/j39RT1mSnd2G" crossorigin="anonymous"></script>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <script>
@@ -32,6 +33,14 @@
         }
     </script>
 
+    <style>
+        @keyframes fade-in {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in { animation: fade-in 0.2s ease-out forwards; }
+    </style>
+
     <script>
         // On page load or when changing themes, best to add inline in `head` to avoid FOUC
         if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
@@ -41,7 +50,9 @@
         }
     </script>
 </head>
-<body class="bg-gray-100 dark:bg-[#050505] text-gray-900 dark:text-gray-100 font-sans transition-colors duration-300 overflow-hidden">
+    <body class="bg-gray-100 dark:bg-[#050505] text-gray-900 dark:text-gray-100 font-sans transition-colors duration-300 overflow-hidden" hx-ext="ws">
+    <script src="https://unpkg.com/hyperscript.org@0.9.14"></script>
+
 
     <div class="fixed inset-0 z-0 pointer-events-none">
         <div class="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] bg-brand-purple/20 rounded-full blur-[120px] opacity-50 dark:opacity-40"></div>
@@ -53,4 +64,6 @@
     </main>
 
 </body>
+
+
 </html>

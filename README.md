@@ -1,5 +1,11 @@
 ![image](static/logo.png)
 
+## Technologies Used
+
+- Django: For backend and normal views
+- Django REST Framework: For API Bulding
+- HTMX: For client side rendering
+
 ## Setting up Mail Credentials
 
 ### Step 1: Configure Your Google Account for an App Password

@@ -1,0 +1,70 @@
+<div class="h-16 border-b border-gray-300 dark:border-white/10 flex items-center justify-between px-4 bg-white/90 dark:bg-black/40 backdrop-blur-md z-10 flex-shrink-0 animate-fade-in">
+    <div class="flex items-center gap-3">
+        <button onclick="closeChat()" class="md:hidden w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-900 dark:hover:text-white">
+            <i class="fa-solid fa-arrow-left"></i>
+        </button>
+        
+        <img src="https://ui-avatars.com/api/?name={{selected_user.username}}&background=7928ca&color=fff" class="w-10 h-10 rounded-full border border-gray-200 dark:border-gray-700">
+        <div>
+            <h3 class="font-bold text-gray-900 dark:text-white text-sm">{{ selected_user.username}}</h3>
+            <div class="flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                <span class="text-xs text-green-500 font-mono">online</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex items-center gap-4 text-gray-400">
+        <button class="hover:text-brand-purple transition-colors"><i class="fa-solid fa-phone"></i></button>
+        <button class="hover:text-brand-cyan transition-colors"><i class="fa-solid fa-video"></i></button>
+        <div class="w-px h-5 bg-gray-300 dark:bg-gray-700"></div>
+        <button class="hover:text-gray-600 dark:hover:text-white transition-colors"><i class="fa-solid fa-magnifying-glass"></i></button>
+        <button class="hover:text-gray-600 dark:hover:text-white transition-colors"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+    </div>
+</div>
+
+<div class="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-6 relative bg-[#f9fafb]/50 dark:bg-transparent animate-fade-in" id="chat-messages">
+    
+    <div class="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none" 
+            style="background-image: radial-gradient(#7928ca 1px, transparent 1px); background-size: 20px 20px;">
+    </div>
+
+    <div class="flex justify-center relative z-10">
+        <span class="bg-gray-200 dark:bg-black/50 text-gray-600 dark:text-gray-400 text-[10px] font-mono px-3 py-1 rounded-full border border-gray-300 dark:border-white/10 shadow-sm backdrop-blur-sm">
+            Today
+        </span>
+    </div>
+
+    
+    {%for msg in messages%}
+        {% include 'chats/partials/chat-pills.html' %}
+    {%endfor%}
+
+</div>
+
+<div class="p-4 bg-white/90 dark:bg-black/40 dark:backdrop-blur-md border-t border-gray-300 dark:border-white/10 z-20 flex-shrink-0 animate-fade-in">
+    <form class="flex items-end gap-2"
+        hx-post="{% url 'chat_conversation' selected_user.id %}"
+        hx-target="#chat-messages"
+        hx-swap="beforeend">
+
+        {% csrf_token %}
+        <button type="button" class="w-10 h-10 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 text-gray-500 dark:text-gray-400 transition-colors flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-plus"></i>
+        </button>
+        <div class="flex-1 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl flex items-center px-4 py-2 focus-within:border-brand-purple focus-within:ring-1 focus-within:ring-brand-purple transition-all shadow-inner">
+            <button type="button" class="text-gray-400 hover:text-yellow-500 mr-2 transition-colors">
+                <i class="fa-regular fa-face-smile"></i>
+            </button>
+            {% comment %} <input type="text" id="msg-input" placeholder="Type a message..." 
+                class="w-full bg-transparent border-none outline-none text-gray-900 dark:text-white placeholder-gray-500 max-h-32"> {% endcomment %}
+            {{form.body}}
+            <button type="button" class="text-gray-400 hover:text-brand-cyan ml-2 transition-colors">
+                <i class="fa-solid fa-paperclip"></i>
+            </button>
+        </div>
+        <button type="submit" class="w-10 h-10 rounded-full bg-brand-purple hover:bg-brand-purple/90 text-white flex items-center justify-center shadow-lg shadow-brand-purple/20 transition-all shrink-0">
+            <i class="fa-solid fa-paper-plane text-sm"></i>
+        </button>
+    </form>
+</div>
