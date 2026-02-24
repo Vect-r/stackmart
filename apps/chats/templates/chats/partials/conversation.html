@@ -37,16 +37,17 @@
 
     
     {%for msg in messages%}
-        {% include 'chats/partials/chat-pills.html' %}
+        {% include 'chats/chat-pills.html' %}
     {%endfor%}
 
 </div>
 
 <div class="p-4 bg-white/90 dark:bg-black/40 dark:backdrop-blur-md border-t border-gray-300 dark:border-white/10 z-20 flex-shrink-0 animate-fade-in">
-    <form class="flex items-end gap-2"
-        hx-post="{% url 'chat_conversation' selected_user.id %}"
-        hx-target="#chat-messages"
-        hx-swap="beforeend">
+    <form class="flex items-end gap-2" id="websocket-target"
+        hx-ext="ws"
+        ws-connect="/ws/chats/{{ selected_user.id }}"
+        ws-send
+        _="on htmx:wsAfterSend reset() me">
 
         {% csrf_token %}
         <button type="button" class="w-10 h-10 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 text-gray-500 dark:text-gray-400 transition-colors flex items-center justify-center shrink-0">
@@ -68,3 +69,17 @@
         </button>
     </form>
 </div>
+
+{% block javascript %}
+<script>
+    // 1. HTMX Chat Auto-Scrolling
+    function scrollChatToBottom() {
+        const container = document.getElementById("chat-messages");
+        if (container) {
+            container.scrollTop = container.scrollHeight;
+        }
+    }
+    document.body.addEventListener("htmx:wsAfterSend", scrollChatToBottom);
+    document.body.addEventListener("htmx:wsAfterMessage", scrollChatToBottom)
+</script>
+{% endblock javascript %}
