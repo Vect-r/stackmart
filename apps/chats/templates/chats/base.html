@@ -64,6 +64,15 @@
     </main>
 
 </body>
+
+<script>
+// Detect and set local timezone for Django
+if (!document.cookie.includes('django_timezone')) {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    document.cookie = `django_timezone=${tz}; path=/; max-age=31536000`; // Valid for 1 year
+    window.location.reload(); // Quick reload on first visit to apply it
+}
+</script>
 {% block javascript %}
 {% endblock javascript %}
 

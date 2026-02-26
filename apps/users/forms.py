@@ -1,7 +1,7 @@
 from django import forms
 from apps.master.utils.inputValidators import validatePassword as strong_password
 from apps.master.utils.inputValidators import ValidationError
-from apps.master.auth.utils import hash_password
+from apps.master.middlewares.auth.utils import hash_password
 from apps.users.models import Blog
 
 # class PasswordResetForm(forms.Form):

@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from apps.master.utils.inputValidators import *
-from apps.master.auth.utils import *
+from apps.master.middlewares.auth.utils import *
 from apps.users.models import User, UserVerification, SellerProfile, Service, SocialLink, ConnectionRequest, Blog, BlogCategory, BlogImage
 from django.views.decorators.cache import never_cache
 # from django.core.mail import send_mail

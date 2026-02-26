@@ -13,7 +13,7 @@ from django.core.asgi import get_asgi_application
 from channels.routing import ProtocolTypeRouter,URLRouter
 from channels.security.websocket import AllowedHostsOriginValidator
 
-from apps.master.auth.channels_middleware import JWTAuthMiddleware
+from apps.master.middlewares.auth.channels_middleware import JWTAuthMiddleware
 
 from apps.chats import routing
 

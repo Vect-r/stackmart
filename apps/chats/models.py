@@ -20,8 +20,7 @@ class Message(BaseClass):
     conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE, related_name="messages")
     sender = models.ForeignKey(User, on_delete=models.CASCADE)
     body = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    is_read = models.BooleanField(default=False)
+    isRead = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.sender.username}: {self.body[:20]}"

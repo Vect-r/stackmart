@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
 ]
 
 # CUSTOM_APPS
@@ -77,7 +78,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'apps.master.auth.middleware.JWTAuthMiddleware'
+    'apps.master.middlewares.auth.middleware.JWTAuthMiddleware',
+    'apps.master.middlewares.timezone.middleware.TimezoneMiddleware',
 ]
 
 ROOT_URLCONF = 'project.urls'
@@ -92,7 +94,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                # 'apps.master.auth.context_processors.jwt_user_context'
+                # 'apps.master.middlewares.auth.context_processors.jwt_user_context'
             ],
         },
     },

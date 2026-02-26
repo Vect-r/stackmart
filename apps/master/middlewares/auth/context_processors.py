@@ -1,4 +1,4 @@
-from apps.master.auth.utils import decode_token
+from apps.master.middlewares.auth.utils import decode_token
 from apps.users.models import User
 
 # def jwt_user_context(request):

@@ -5,6 +5,8 @@ import json
 from apps.users.models import *
 from django.shortcuts import get_object_or_404
 from .models import Message,get_or_create_conversation
+import zoneinfo
+from django.utils import timezone
 
 
 class ChatConsumer(WebsocketConsumer):
@@ -44,7 +46,27 @@ class ChatConsumer(WebsocketConsumer):
         )
 
     def message_handler(self,event):
-        message_id=event['message_id']
+        # message_id=event['message_id']
+        # message = Message.objects.get(id=message_id)
+        # html = render_to_string("chats/partials/chat-pills-p.html",context={"msg":message,'current_user':self.user,'selected_user':get_object_or_404(User,id=self.other_user_id)})
+        # self.send(text_data=html)
+        message_id = event['message_id']
         message = Message.objects.get(id=message_id)
-        html = render_to_string("chats/partials/chat-pills-p.html",context={"msg":message,'current_user':self.user,'selected_user':get_object_or_404(User,id=self.other_user_id)})
+        
+        # 1. Grab timezone from WebSocket Cookies
+        tzname = self.scope.get('cookies', {}).get('django_timezone')
+        if tzname:
+            try:
+                timezone.activate(zoneinfo.ZoneInfo(tzname))
+            except Exception:
+                pass
+
+        html = render_to_string(
+            "chats/partials/chat-pills-p.html",
+            context={
+                "msg": message,
+                'current_user': self.user,
+                'selected_user': get_object_or_404(User, id=self.other_user_id)
+            }
+        )
         self.send(text_data=html)

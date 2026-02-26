@@ -1,12 +1,16 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Q
 
-from apps.master.auth.utils import login_required_jwt
+from django.utils import timezone
+
+from apps.master.middlewares.auth.utils import login_required_jwt
 from .models import User, Conversation, Message, get_or_create_conversation
 from .forms import SendMessageForm
 
-
 # Create your views here.
+def demo(request):
+    return render(request,"chats/demo.html")
+
 @login_required_jwt
 def chatsIndex(request,user_id=None):
     current_user = request.authenticated_user
@@ -39,6 +43,9 @@ def chatsIndex(request,user_id=None):
         messages = Message.objects.filter(
             conversation=conversation
         ).select_related('sender').order_by('created_at')
+
+        for msg in messages:
+            msg.local_date = timezone.localtime(msg.created_at).date()
         context={'selected_user':selected_user,'messages':messages,'current_user':current_user,'form':form}
         return render(request, 'chats/partials/conversation.html', context)
 

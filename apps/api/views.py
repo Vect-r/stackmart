@@ -17,7 +17,7 @@ from .filters import BlogFilter
 
 import json
 
-from apps.master.auth.utils import login_required_jwt
+from apps.master.middlewares.auth.utils import login_required_jwt
 # Create your views here.
 
 class BlogListView(ListAPIView):
