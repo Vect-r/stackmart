@@ -138,7 +138,7 @@
                         {%else%}
                         <a href="{%url 'blog'%}" class="font-mono text-sm font-medium hover:text-brand-cyan transition-colors px-3 py-2 rounded-md">Blogs</a>
                         {%endif%}
-                        <a href="#" class="font-mono text-sm font-medium hover:text-brand-cyan transition-colors px-3 py-2 rounded-md">Community</a>
+                        <a href="{% url "chats_dashboard" %}" class="font-mono text-sm font-medium hover:text-brand-cyan transition-colors px-3 py-2 rounded-md">Chats</a>
                         <a href="{% url 'about' %}" class="font-mono text-sm font-medium hover:text-brand-cyan transition-colors px-3 py-2 rounded-md">About Us</a>
                     </div>
                 </div>

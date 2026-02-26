@@ -19,12 +19,18 @@ class ChatConsumer(WebsocketConsumer):
         async_to_sync(self.channel_layer.group_add)(
             self.conversation.id, self.channel_name
         )
+        self.set_user_status(True)
+        self.update_user_status()
+
         self.accept()
 
     def disconnect(self, close_code):
         async_to_sync(self.channel_layer.group_discard)(
             self.conversation.id,self.channel_name
         )
+        self.set_user_status(False)
+        self.update_user_status()
+        
 
     def receive(self, text_data = None,):
         text_data_json = json.loads(text_data)
@@ -54,7 +60,7 @@ class ChatConsumer(WebsocketConsumer):
         message = Message.objects.get(id=message_id)
         
         # 1. Grab timezone from WebSocket Cookies
-        tzname = self.scope.get('cookies', {}).get('django_timezone')
+        tzname = self.scope.get('local_tz')
         if tzname:
             try:
                 timezone.activate(zoneinfo.ZoneInfo(tzname))
@@ -70,3 +76,37 @@ class ChatConsumer(WebsocketConsumer):
             }
         )
         self.send(text_data=html)
+
+    def user_presence_handler(self,event):
+        context = {
+           'user':event['user']
+        }
+        html = render_to_string('chats/partials/user-status.html',context)
+        self.send(html)
+
+
+    def update_user_status(self):
+        # tzname = self.scope.get('cookies', {}).get('django_timezone')
+        tzname = self.scope.get('local_tz')
+        if tzname:
+            try:
+                timezone.activate(zoneinfo.ZoneInfo(tzname))
+            except Exception:
+                pass
+
+        # print(tzname)
+
+        event = {
+            'type': 'user_presence_handler',
+            'user': self.user,
+        }
+        async_to_sync(self.channel_layer.group_send)(
+            self.conversation.id,event
+        )
+
+
+    def set_user_status(self,online_status):
+        self.user.is_online=online_status
+        if not online_status:
+            self.user.last_seen = timezone.now()
+        self.user.save()

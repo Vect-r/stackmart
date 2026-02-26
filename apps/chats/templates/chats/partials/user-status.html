@@ -1,0 +1,11 @@
+{% load humanize %}
+<div class="flex items-center gap-1.5" id="user-presence">
+    {%if user.is_online%}
+    <span id="status_indicator" class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+    <span class="text-xs text-green-500 font-mono">online</span>
+    {%elif user.last_seen%}
+    <span class="text-xs text-grey-500 font-mono">Last Seen {{user.last_seen.date|naturalday|title}}, {{user.last_seen|date:"h:i A"}}</span>
+    {%else%}
+    <span class="text-xs text-grey-500 font-mono">offline</span>
+    {% endif %}
+</div> 

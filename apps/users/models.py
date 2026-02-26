@@ -38,8 +38,8 @@ class User(BaseClass):
     is_active = models.BooleanField(default=False)
     is_mail_verified = models.BooleanField(default=False)
     last_login = models.DateTimeField(null=True, blank=True)
-    isOnline = models.BooleanField(default=False)
-    lastSeen = models.DateTimeField(null=True, blank=True)
+    is_online = models.BooleanField(default=False)
+    last_seen = models.DateTimeField(null=True, blank=True)
 
     def remove_profile_picture(self):
         if self.profile and self.profile.name != "defaults/user-avatar.svg":

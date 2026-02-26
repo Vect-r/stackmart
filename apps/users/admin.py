@@ -1,7 +1,8 @@
 from django.contrib import admin
 from apps.users.models import *
 class UserAdmin(admin.ModelAdmin):
-    list_filter = ["is_active"]
+    list_filter = ["is_active",'is_online']
+    list_display = ['id','username','created_at','last_login','is_online','user_type']
 
 
 

@@ -7,10 +7,11 @@
         <img src="https://ui-avatars.com/api/?name={{selected_user.username}}&background=7928ca&color=fff" class="w-10 h-10 rounded-full border border-gray-200 dark:border-gray-700">
         <div>
             <h3 class="font-bold text-gray-900 dark:text-white text-sm">{{ selected_user.username}}</h3>
-            <div class="flex items-center gap-1.5">
+            {% comment %} <div class="flex items-center gap-1.5">
                 <span id="status_indicator_{{selected_user.id}}" class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
                 <span class="text-xs text-green-500 font-mono">online</span>
-            </div>
+            </div> {% endcomment %}
+            {% include "chats/partials/user-status.html" with user=selected_user%}
         </div>
     </div>
 

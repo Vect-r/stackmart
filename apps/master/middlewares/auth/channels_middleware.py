@@ -12,15 +12,21 @@ from .utils import decode_token
 class JWTAuthMiddleware(BaseMiddleware):
     async def __call__(self, scope, receive, send):
         scope["user"] = None
+        scope["local_tz"] = None
 
         headers = dict(scope["headers"])
         # print(headers)
         cookies = headers.get(b"cookie", b"").decode()
+        # print(cookies)
 
         session_key = None
         for part in cookies.split(";"):
             if "sessionid=" in part:
                 session_key = part.split("=")[1].strip()
+            
+            if "django_timezone=" in part:
+                scope['local_tz'] = part.split("=")[1].strip()
+            
 
 
         if session_key:
@@ -34,6 +40,7 @@ class JWTAuthMiddleware(BaseMiddleware):
                     try:
                         user = await sync_to_async(User.objects.get)(id=payload["user_id"])
                         scope["user"] = user
+                        # scope['local_tz']= local_timezone
                     except User.DoesNotExist:
                         scope["user"] = None
 
