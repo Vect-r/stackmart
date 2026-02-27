@@ -82,6 +82,11 @@ class StatusConsumer(AsyncWebsocketConsumer):
         if 'is_active' in data:
             await self.update_status(data['is_active'])
 
+    async def indicator_status_handler(self, event):
+        # Change 'return' to 'await'
+        circle_html = await get_rendered_status_circle_html(event['user_id'])
+        await self.send(text_data=circle_html)
+
     async def update_status(self, is_online):
         # 1. Update Database globally
         await update_user_status_db(self.user, is_online)
@@ -94,6 +99,12 @@ class StatusConsumer(AsyncWebsocketConsumer):
             await self.channel_layer.group_send(
                 str(conv_id), {'type': 'status_handler','user_id': self.user.id,'status': is_online,'last_seen': self.user.last_seen,}
             )
+            
+        # 4. FIX: Broadcast to global_man (Must specify the group name!)
+        await self.channel_layer.group_send(
+            'global_man', 
+            {'type': 'indicator_status_handler', 'user_id': self.user.id}
+        )
             
             
 

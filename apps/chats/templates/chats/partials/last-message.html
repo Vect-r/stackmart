@@ -1,0 +1,5 @@
+{%if conversation.last_message.sender == request.authenticated_user%}
+<p id="cnv_id_{{conversation.id}}" class="text-sm text-gray-600 dark:text-gray-300 truncate">You: {{conversation.last_message.body}}</p>
+{%else%}
+<p id="cnv_id_{{conversation.id}}" class="text-sm text-gray-600 dark:text-gray-300 truncate">{{conversation.last_message}}</p>
+{%endif%}

@@ -52,10 +52,15 @@
                 </div>
                 <div class="flex-1 min-w-0 z-10">
                     <div class="flex justify-between items-baseline mb-0.5">
-                        <h3 class="font-bold text-gray-900 dark:text-white truncate">{{conversation.user1.username}} U1</h3>
-                        <span class="text-[10px] font-mono text-brand-purple">12:05 PM</span>
+                        <h3 class="font-bold text-gray-900 dark:text-white truncate">{{conversation.user1.username}}</h3>
+                        <span class="text-[10px] font-mono text-brand-purple">{{conversation.last_message.created_at}}</span>
                     </div>
-                    <p class="text-sm text-gray-600 dark:text-gray-300 truncate">Did you push the hotfix?</p>
+                    {% comment %} <p class="text-sm text-gray-600 dark:text-gray-300 truncate">Did you push the hotfix?</p> {% endcomment %}
+                    {%if conversation.last_message.sender == request.authenticated_user%}
+                    <p id="cnv_id_{{conversation.id}}" class="text-sm text-gray-600 dark:text-gray-300 truncate">You: {{conversation.last_message.body}}</p>
+                    {%else%}
+                    <p id="cnv_id_{{conversation.id}}" class="text-sm text-gray-600 dark:text-gray-300 truncate">{{conversation.last_message}}</p>
+                    {%endif%}
                 </div>
             </div>
             {% else %}
@@ -73,10 +78,16 @@
                 <div class="flex-1 min-w-0">
                     <div class="flex justify-between items-baseline mb-0.5">
                         <h3 class="font-bold text-gray-900 dark:text-white truncate">{{conversation.user2.username}} U2 </h3>
-                        <span class="text-[10px] font-mono text-gray-500 group-hover:text-gray-400">Yesterday</span>
+                        {% comment %} <span class="text-[10px] font-mono text-gray-500 group-hover:text-gray-400">Yesterday</span> {% endcomment %}
+                        <span class="text-[10px] font-mono text-brand-purple">{{conversation.last_message.created_at}}</span>
                     </div>
                     <div class="flex justify-between items-center">
-                        <p class="text-sm text-gray-600 dark:text-gray-400 truncate font-semibold">Can we schedule a meeting?</p>
+                        {% comment %} <p class="text-sm text-gray-600 dark:text-gray-400 truncate font-semibold">Can we schedule a meeting?</p> {% endcomment %}
+                        {%if conversation.last_message.sender == request.authenticated_user%}
+                        <p id="cnv_id_{{conversation.id}}" class="text-sm text-gray-600 dark:text-gray-300 truncate">You: {{conversation.last_message.body}}</p>
+                        {%else%}
+                        <p id="cnv_id_{{conversation.id}}" class="text-sm text-gray-600 dark:text-gray-300 truncate">{{conversation.last_message}}</p>
+                        {%endif%}
                         <span class="w-5 h-5 rounded-full bg-brand-cyan text-black text-[10px] font-bold flex items-center justify-center shadow-sm">2</span>
                     </div>
                 </div>
@@ -189,11 +200,10 @@
         // Parse the incoming HTML string into DOM elements
         const parser = new DOMParser();
         const doc = parser.parseFromString(event.data, "text/html");
-        console.log(doc)
         
         // Find all elements containing hx-swap-oob="true"
         const oobElements = doc.querySelectorAll('[hx-swap-oob="true"]');
-        console.log(oobElements)
+        
         // Swap them dynamically by ID
         oobElements.forEach(el => {
             const target = document.getElementById(el.id);
