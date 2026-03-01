@@ -1,6 +1,6 @@
 {%if msg.sender != current_user%}
 <div class="flex items-end gap-2 max-w-[85%] md:max-w-[70%] relative z-10 animate-fade-in">
-    <img src="https://ui-avatars.com/api/?name={{ current_user.username }}&background=7928ca&color=fff" class="w-6 h-6 rounded-full mb-1 border border-white dark:border-transparent shadow-sm">
+    <img src="https://ui-avatars.com/api/?name={{ msg.sender.username }}&background=7928ca&color=fff" class="w-6 h-6 rounded-full mb-1 border border-white dark:border-transparent shadow-sm">
     <div class="bg-white dark:bg-black/60 dark:backdrop-blur-md border border-gray-200 dark:border-white/10 p-3 rounded-2xl rounded-bl-none shadow-sm">
         <p class="text-sm text-gray-800 dark:text-gray-200">{{msg.body}}</p>
         <span class="text-[10px] text-gray-400 block text-right mt-1 font-mono">{{msg.created_at|date:"h:i a"}}</span>
@@ -12,7 +12,9 @@
         <p class="text-sm font-medium">{{msg.body}}</p>
         <div class="flex items-center justify-end gap-1 mt-1">
             <span class="text-[10px] text-white/70 font-mono">{{msg.created_at|date:"h:i a"}}</span>
-            <i class="fa-solid fa-check-double text-[10px] text-white/90"></i>
+            {% comment %} <i class="fa-solid fa-check-double text-[10px] text-white/90"></i> {% endcomment %}
+            {% comment %} <i class="fa-solid fa-check{% if msg.is_read %}-double text-blue-500{% else %} text-gray-700{% endif %} text-[10px] mr-1"></i> {% endcomment %}
+            {% include 'chats/partials/read-receipt.html' with msg=msg%}
         </div>
     </div>
 </div>

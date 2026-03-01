@@ -5,7 +5,7 @@ from .models import *
 # admin.site.register(Message)
 @admin.register(Message)
 class MessageAdmin(admin.ModelAdmin):
-    list_display = ('body','created_at','sender')
+    list_display = ('body','created_at','sender__username','is_read')
     ordering = ['-created_at']
         
 

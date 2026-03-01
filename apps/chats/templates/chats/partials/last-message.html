@@ -1,5 +1,16 @@
-{%if conversation.last_message.sender == request.authenticated_user%}
-<p id="cnv_id_{{conversation.id}}" class="text-sm text-gray-600 dark:text-gray-300 truncate">You: {{conversation.last_message.body}}</p>
-{%else%}
-<p id="cnv_id_{{conversation.id}}" class="text-sm text-gray-600 dark:text-gray-300 truncate">{{conversation.last_message}}</p>
-{%endif%}
+ <p id="cnv_last_msg_{{conversation.id}}" hx-swap-oob="true" class="text-sm text-gray-600 dark:text-gray-300 truncate">
+    {%if conversation.last_message.sender == current_user%}
+        {% include 'chats/partials/read-receipt.html' with msg=conversation.last_message %} You: {{conversation.last_message.body}}
+    {% else %}
+        {{conversation.last_message}}
+    {% endif %}
+</p>  
+<div id="cnv_id_{{conversation.id}}cnv_unread_count" hx-swap-oob="true">
+    {% load humanize chat_tags %} {% with unread_count=conversation|unread_count_for:current_user %}
+        {% if unread_count > 0 %}
+            <span class="w-5 h-5 rounded-full bg-brand-cyan text-black text-[10px] font-bold flex items-center justify-center shadow-sm shrink-0">
+                {{ unread_count }}
+            </span>
+        {% endif %}
+    {% endwith %}
+</div>

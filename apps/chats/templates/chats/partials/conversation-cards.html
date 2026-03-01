@@ -1,0 +1,36 @@
+{% load humanize %}
+<div hx-get="{% url 'chat_conversation' user.id %}"
+    hx-target="#chat-content"
+    hx-swap="innerHTML"
+    id="cnv_{{ conversation.id}}"
+    onclick="openChat('cnv_{{ conversation.id}}')"
+    hx-swap-oob="true"
+    class="flex items-center gap-3 p-3 rounded-xl hover:bg-white dark:hover:bg-white/5 border border-transparent hover:border-gray-200 dark:hover:border-white/5 cursor-pointer transition-all group">
+    <div class="relative">
+        <img src="https://ui-avatars.com/api/?name={{user.username}}&background=random" class="w-12 h-12 rounded-full object-cover">
+        {%include 'chats/partials/chat-profile-status-indicator.html' with user=user%}
+    </div>
+    <div class="flex-1 min-w-0">
+        <div class="flex justify-between items-baseline mb-0.5">
+            <h3 class="font-bold text-gray-900 dark:text-white truncate">{{user.username}} U2 </h3>
+            <span class="text-[10px] font-mono text-gray-500 group-hover:text-gray-400">{{conversation.last_message.created_at|naturalday|title}}</span>
+        </div>
+        <div class="flex justify-between items-center">
+            <p id="cnv_id_{{conversation.id}}" class="text-sm text-gray-600 dark:text-gray-300 truncate">
+            {% if conversation.last_message.sender == current_user %}
+                <i class="fa-solid fa-check{% if conversation.last_message.is_read %}-double text-blue-500{% else %} text-gray-400{% endif %} text-[10px] mr-1"></i>You: {{conversation.last_message.body}}
+            {% else %}
+                {{conversation.last_message}}
+            {% endif %}
+            </p>
+            {% with unread_count=conversation.get_unread_count|default:"0" %}
+                {% if unread_count|add:"0" > 0 %}
+                    <span class="w-5 h-5 rounded-full bg-brand-cyan text-black text-[10px] font-bold flex items-center justify-center shadow-sm shrink-0">
+                        {{ unread_count }}
+                    </span>
+                {% endif %}
+            {% endwith %}
+            {% comment %} <span class="w-5 h-5 rounded-full bg-brand-cyan text-black text-[10px] font-bold flex items-center justify-center shadow-sm"></span> {% endcomment %}
+        </div>
+    </div>
+</div>

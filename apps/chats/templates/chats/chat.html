@@ -34,7 +34,7 @@
                     class="w-full bg-white dark:bg-white/5 border border-gray-300 dark:border-white/10 focus:border-brand-purple focus:ring-1 focus:ring-brand-purple rounded-lg py-2 pl-10 pr-4 text-sm outline-none transition-all text-gray-900 dark:text-white placeholder-gray-500 font-mono shadow-sm">
             </div>
         </div>
-
+        {% load humanize %}
         <div class="flex-1 overflow-y-auto custom-scrollbar p-2 space-y-1">
             {% for conversation in conversations %}
             {% if conversation.user1 != request.authenticated_user%}
@@ -47,20 +47,15 @@
                 
                 <div class="relative z-10">
                     <img src="https://ui-avatars.com/api/?name={{conversation.user1.username}}&background=7928ca&color=fff" class="w-12 h-12 rounded-full object-cover">
-                    {% comment %} <span id="status_indicator_{{selected_user.id}}" class="absolute bottom-0 right-0 w-3 h-3 {%if conversation.user1.is_online%} bg-green-500 border-2 {% else %} bg-gray-400 {% endif %} border-2 border-white dark:border-black rounded-full"></span> {% endcomment %}
                     {%include 'chats/partials/chat-profile-status-indicator.html' with user=conversation.user1%}
                 </div>
                 <div class="flex-1 min-w-0 z-10">
                     <div class="flex justify-between items-baseline mb-0.5">
                         <h3 class="font-bold text-gray-900 dark:text-white truncate">{{conversation.user1.username}}</h3>
-                        <span class="text-[10px] font-mono text-brand-purple">{{conversation.last_message.created_at}}</span>
+                        <span class="text-[10px] font-mono text-gray-500 group-hover:text-gray-400">{{conversation.last_message.created_at|naturalday|title}}</span>
                     </div>
-                    {% comment %} <p class="text-sm text-gray-600 dark:text-gray-300 truncate">Did you push the hotfix?</p> {% endcomment %}
-                    {%if conversation.last_message.sender == request.authenticated_user%}
-                    <p id="cnv_id_{{conversation.id}}" class="text-sm text-gray-600 dark:text-gray-300 truncate">You: {{conversation.last_message.body}}</p>
-                    {%else%}
-                    <p id="cnv_id_{{conversation.id}}" class="text-sm text-gray-600 dark:text-gray-300 truncate">{{conversation.last_message}}</p>
-                    {%endif%}
+                    {% include "chats/partials/last-message.html" with conversation=conversation current_user=request.authenticated_user %}
+                    
                 </div>
             </div>
             {% else %}
@@ -72,23 +67,16 @@
                  class="flex items-center gap-3 p-3 rounded-xl hover:bg-white dark:hover:bg-white/5 border border-transparent hover:border-gray-200 dark:hover:border-white/5 cursor-pointer transition-all group">
                 <div class="relative">
                     <img src="https://ui-avatars.com/api/?name={{conversation.user2.username}}&background=random" class="w-12 h-12 rounded-full object-cover">
-                    {% comment %} <span id="status_indicator_{{selected_user.id}}" class="absolute bottom-0 right-0 w-3 h-3 {%if conversation.user2.is_online%} bg-green-500 border-2 {% else %} bg-gray-400 {% endif %} border-2 border-white dark:border-black rounded-full"></span> {% endcomment %}
                     {%include 'chats/partials/chat-profile-status-indicator.html' with user=conversation.user2%}
                 </div>
                 <div class="flex-1 min-w-0">
                     <div class="flex justify-between items-baseline mb-0.5">
                         <h3 class="font-bold text-gray-900 dark:text-white truncate">{{conversation.user2.username}} U2 </h3>
-                        {% comment %} <span class="text-[10px] font-mono text-gray-500 group-hover:text-gray-400">Yesterday</span> {% endcomment %}
-                        <span class="text-[10px] font-mono text-brand-purple">{{conversation.last_message.created_at}}</span>
+                        <span class="text-[10px] font-mono text-gray-500 group-hover:text-gray-400">{{conversation.last_message.created_at|naturalday|title}}</span>
                     </div>
                     <div class="flex justify-between items-center">
-                        {% comment %} <p class="text-sm text-gray-600 dark:text-gray-400 truncate font-semibold">Can we schedule a meeting?</p> {% endcomment %}
-                        {%if conversation.last_message.sender == request.authenticated_user%}
-                        <p id="cnv_id_{{conversation.id}}" class="text-sm text-gray-600 dark:text-gray-300 truncate">You: {{conversation.last_message.body}}</p>
-                        {%else%}
-                        <p id="cnv_id_{{conversation.id}}" class="text-sm text-gray-600 dark:text-gray-300 truncate">{{conversation.last_message}}</p>
-                        {%endif%}
-                        <span class="w-5 h-5 rounded-full bg-brand-cyan text-black text-[10px] font-bold flex items-center justify-center shadow-sm">2</span>
+                        {% include "chats/partials/last-message.html" with conversation=conversation current_user=request.authenticated_user %}
+                        
                     </div>
                 </div>
             </div>

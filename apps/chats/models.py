@@ -20,11 +20,25 @@ class Conversation(BaseClass):
     def last_message(self):
         return self.messages.order_by('-created_at').first()
     
+    @property
+    def get_unread_count_user1(self):
+        # Count messages in this conversation where the user is NOT the sender, and is_read is False
+        return self.messages.filter(is_read=False).exclude(sender=self.user1).count()
+    
+    @property
+    def get_unread_count_user2(self):
+        # Count messages in this conversation where the user is NOT the sender, and is_read is False
+        return self.messages.filter(is_read=False).exclude(sender=self.user2).count()
+    
+    def get_unread_count_user(self,user):
+        # Count messages in this conversation where the user is NOT the sender, and is_read is False
+        return self.messages.filter(is_read=False).exclude(sender=user).count()
+    
 class Message(BaseClass):
     conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE, related_name="messages")
     sender = models.ForeignKey(User, on_delete=models.CASCADE)
     body = models.TextField()
-    isRead = models.BooleanField(default=False)
+    is_read = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.sender.username}: {self.body[:20]}"

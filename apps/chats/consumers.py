@@ -35,7 +35,6 @@ def get_rendered_status_circle_html(user_id):
         context={"user": selected_user}
     )
 
-
 @database_sync_to_async
 def get_user_conversation_ids(user):
     return list(Conversation.objects.filter(
@@ -59,10 +58,25 @@ def create_message(content, sender, conversation):
     )
 
 @database_sync_to_async
+def mark_messages_read_db(conversation, current_user):
+    # Update all unread messages sent by the OTHER user to read
+    Message.objects.filter(conversation=conversation, is_read=False).exclude(sender=current_user).update(is_read=True)
+
+@database_sync_to_async
+def get_rendered_last_msg_html(conversation_id,current_user):
+    conversation = Conversation.objects.get(id=conversation_id)
+    return render_to_string('chats/partials/last-message.html',context={'conversation':conversation,'current_user':current_user})
+
+@database_sync_to_async
 def get_rendered_message_html(message_id, user):
     message = Message.objects.get(id=message_id)
     # Rendering templates might hit the DB to load related models, so it stays here
     return render_to_string("chats/partials/chat-pills-p.html", context={"msg": message, 'current_user': user})
+
+# @database_sync_to_async
+def get_rendered_read_receipt_html(message_id):
+    message = Message.objects.get(id=message_id)
+    return render_to_string("chats/partials/read-receipt.html",context={"msg":message})
 
 
 class StatusConsumer(AsyncWebsocketConsumer):
@@ -87,6 +101,10 @@ class StatusConsumer(AsyncWebsocketConsumer):
         circle_html = await get_rendered_status_circle_html(event['user_id'])
         await self.send(text_data=circle_html)
 
+    async def last_message_handler(self,event):
+        html = await get_rendered_last_msg_html(event['conversation_id'],self.user)
+        await self.send(text_data=html)
+
     async def update_status(self, is_online):
         # 1. Update Database globally
         await update_user_status_db(self.user, is_online)
@@ -106,8 +124,6 @@ class StatusConsumer(AsyncWebsocketConsumer):
             {'type': 'indicator_status_handler', 'user_id': self.user.id}
         )
             
-            
-
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -117,11 +133,20 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # Await our database helper functions
         selected_user = await get_user_by_id(self.other_user_id)
         self.conversation = await get_or_create_conv_async(self.user, selected_user)
+
         
+        await mark_messages_read_db(self.conversation, self.user)
+
+    
         # Native await for channel layer methods (no async_to_sync)
         await self.channel_layer.group_add(
             str(self.conversation.id), self.channel_name
         )
+
+        await self.channel_layer.group_send(
+           "global_man", {'type':"last_message_handler",'conversation_id':self.conversation.id}
+        )
+
         await self.accept()
 
     async def disconnect(self, close_code):
@@ -144,6 +169,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         await self.channel_layer.group_send(
             str(self.conversation.id), event
+        )
+
+        await self.channel_layer.group_send(
+           "global_man", {'type':"last_message_handler",'conversation_id':self.conversation.id}
         )
 
     async def message_handler(self, event):
