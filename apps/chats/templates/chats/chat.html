@@ -45,16 +45,20 @@
                  onclick="openChat('user_{{ conversation.user1.id}}')"
                  class="flex items-center gap-3 p-3 rounded-xl hover:bg-white dark:hover:bg-white/5 border border-transparent hover:border-gray-200 dark:hover:border-white/5 cursor-pointer transition-all group">
                 
-                <div class="relative z-10">
+                <div class="relative">
                     <img src="https://ui-avatars.com/api/?name={{conversation.user1.username}}&background=7928ca&color=fff" class="w-12 h-12 rounded-full object-cover">
                     {%include 'chats/partials/chat-profile-status-indicator.html' with user=conversation.user1%}
                 </div>
-                <div class="flex-1 min-w-0 z-10">
+                <div class="flex-1 min-w-0">
                     <div class="flex justify-between items-baseline mb-0.5">
-                        <h3 class="font-bold text-gray-900 dark:text-white truncate">{{conversation.user1.username}}</h3>
-                        <span class="text-[10px] font-mono text-gray-500 group-hover:text-gray-400">{{conversation.last_message.created_at|naturalday|title}}</span>
+                        <h3 class="font-bold text-gray-900 dark:text-white truncate">{{conversation.user1.username}} U1</h3>
+                        {% comment %} <span class="text-[10px] font-mono text-gray-500 group-hover:text-gray-400">{{conversation.last_message.created_at|naturalday|title}}</span> {% endcomment %}
+                        {% include 'chats/partials/last-message-date.html' with conversation=conversation %}
                     </div>
-                    {% include "chats/partials/last-message.html" with conversation=conversation current_user=request.authenticated_user %}
+                    <div class="flex justify-between items-center">
+                        {% include "chats/partials/last-message.html" with conversation=conversation current_user=request.authenticated_user %}
+                        
+                    </div>
                     
                 </div>
             </div>
@@ -72,7 +76,8 @@
                 <div class="flex-1 min-w-0">
                     <div class="flex justify-between items-baseline mb-0.5">
                         <h3 class="font-bold text-gray-900 dark:text-white truncate">{{conversation.user2.username}} U2 </h3>
-                        <span class="text-[10px] font-mono text-gray-500 group-hover:text-gray-400">{{conversation.last_message.created_at|naturalday|title}}</span>
+                        {% comment %} <span class="text-[10px] font-mono text-gray-500 group-hover:text-gray-400">{{conversation.last_message.created_at|naturalday|title}}</span> {% endcomment %}
+                        {% include 'chats/partials/last-message-date.html' with conversation=conversation %}
                     </div>
                     <div class="flex justify-between items-center">
                         {% include "chats/partials/last-message.html" with conversation=conversation current_user=request.authenticated_user %}

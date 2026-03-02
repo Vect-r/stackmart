@@ -36,6 +36,11 @@ def get_rendered_status_circle_html(user_id):
     )
 
 @database_sync_to_async
+def get_rendered_last_msg_date(conversation_id):
+    conversation=Conversation.objects.get(id=conversation_id)
+    return render_to_string('chats/partials/last-message-date.html',context={'conversation':conversation})
+
+@database_sync_to_async
 def get_user_conversation_ids(user):
     return list(Conversation.objects.filter(
         models.Q(user1=user) | models.Q(user2=user)
@@ -103,7 +108,8 @@ class StatusConsumer(AsyncWebsocketConsumer):
 
     async def last_message_handler(self,event):
         html = await get_rendered_last_msg_html(event['conversation_id'],self.user)
-        await self.send(text_data=html)
+        date_ = await get_rendered_last_msg_date(event['conversation_id'])
+        await self.send(text_data=html+date_)
 
     async def update_status(self, is_online):
         # 1. Update Database globally

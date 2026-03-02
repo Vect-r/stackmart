@@ -1,0 +1,2 @@
+{% load humanize %}
+<span id="cnv_id_{{conversation.id}}_last_msg_date" hx-swap-oob="true" class="text-[10px] font-mono text-gray-500 group-hover:text-gray-400">{{conversation.last_message.created_at|naturalday|title}}</span>
