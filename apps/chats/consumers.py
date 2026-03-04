@@ -83,6 +83,19 @@ def get_rendered_read_receipt_html(message_id):
     message = Message.objects.get(id=message_id)
     return render_to_string("chats/partials/read-receipt.html",context={"msg":message})
 
+@database_sync_to_async
+def mark_live_message_read(message_id, current_user):
+    """
+    Checks if the live message was sent by the OTHER user.
+    If so, it means current_user is actively looking at it, so we mark it read.
+    """
+    msg = Message.objects.get(id=message_id)
+    if msg.sender != current_user and not msg.is_read:
+        msg.is_read = True
+        msg.save(update_fields=['is_read'])
+        return True
+    return False
+
 
 class StatusConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -150,6 +163,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
 
         await self.channel_layer.group_send(
+            str(self.conversation.id),{'type': 'read_receipt_handler', 'reader_id': self.user.id}
+        )
+
+        await self.channel_layer.group_send(
            "global_man", {'type':"last_message_handler",'conversation_id':self.conversation.id}
         )
 
@@ -181,6 +198,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
            "global_man", {'type':"last_message_handler",'conversation_id':self.conversation.id}
         )
 
+        
+
+    async def read_receipt_handler(self, event):
+        if event['reader_id'] != self.user.id:
+            html = '<i id="msg-unread-tick" class="fa-solid fa-check-double text-blue-700  text-[10px] mr-1" title="Read"></i>'
+            await self.send(text_data=html)
+
     async def message_handler(self, event):
         message_id = event['message_id']
 
@@ -191,11 +215,31 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 timezone.activate(zoneinfo.ZoneInfo(tzname))
             except Exception:
                 pass
+                
+        # 2. INSTANT READ FIX: Check if we are receiving this message live
+        just_read = await mark_live_message_read(message_id, self.user)
         
-        # Await the fetching and rendering of the HTML snippet
+        if just_read:
+            # Tell the sender's UI to instantly change the grey tick to a blue double-tick
+            await self.channel_layer.group_send(
+                str(self.conversation.id),
+                {'type': 'read_receipt_handler', 'reader_id': self.user.id}
+            )
+            # Update the sidebars globally so the unread badge doesn't falsely appear
+            # await self.channel_layer.group_send(
+            #     str(self.conversation.id),
+            #     {'type': 'sidebar_update_handler', 'conversation_id': self.conversation.id}
+            # )
+            await self.channel_layer.group_send(
+                "global_man", {'type':"last_message_handler",'conversation_id':self.conversation.id}
+            )   
+
+        # 3. Await the fetching and rendering of the HTML snippet
         html = await get_rendered_message_html(message_id, self.user)
         
         await self.send(text_data=html)
+            
+
         
     async def status_handler(self, event):
         # HTMX intercept: Only update the UI if the event belongs to the OTHER user
