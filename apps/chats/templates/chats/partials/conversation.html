@@ -7,10 +7,6 @@
         <img src="https://ui-avatars.com/api/?name={{selected_user.username}}&background=7928ca&color=fff" class="w-10 h-10 rounded-full border border-gray-200 dark:border-gray-700">
         <div>
             <h3 class="font-bold text-gray-900 dark:text-white text-sm">{{ selected_user.username}}</h3>
-            {% comment %} <div class="flex items-center gap-1.5">
-                <span id="status_indicator_{{selected_user.id}}" class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
-                <span class="text-xs text-green-500 font-mono">online</span>
-            </div> {% endcomment %}
             {% include "chats/partials/user-status.html" with user=selected_user%}
         </div>
     </div>
@@ -49,6 +45,83 @@
 
 </div>
 
+<!-- IMAGE UPLOAD MODAL -->
+<div id="image-upload-modal" class="fixed inset-0 bg-white/95 dark:bg-black/95 z-[100] hidden flex-col">
+    <!-- Modal Header -->
+    <div class="h-16 bg-gray-100 dark:bg-[#202124] border-b border-gray-200 dark:border-gray-700/50 flex items-center justify-between px-4 flex-shrink-0">
+        <div class="flex items-center gap-4">
+            <button onclick="closeImageModal()" class="w-10 h-10 flex items-center justify-center text-gray-700 dark:text-white hover:bg-gray-200 dark:hover:bg-white/10 rounded-full transition-colors">
+                <i class="fa-solid fa-xmark text-2xl"></i>
+            </button>
+            <h3 class="text-gray-900 dark:text-white font-semibold text-lg">Preview</h3>
+        </div>
+        <button class="text-gray-500 dark:text-white/60 hover:text-gray-700 dark:hover:text-white text-sm transition-colors">
+            <i class="fa-solid fa-download text-lg"></i>
+        </button>
+    </div>
+
+    <!-- Modal Body - Image Preview -->
+    <div class="flex-1 flex items-center justify-center p-8 overflow-hidden relative bg-gray-50 dark:bg-transparent">
+        <div class="relative max-w-5xl max-h-full">
+            <img id="preview-image" src="" alt="Preview" class="max-w-full max-h-[70vh] object-contain rounded-lg shadow-2xl">
+            
+            <!-- Image Editing Toolbar -->
+            <div class="absolute top-4 left-1/2 -translate-x-1/2 bg-white/90 dark:bg-black/70 backdrop-blur-md rounded-full px-3 py-2 flex items-center gap-2 shadow-xl border border-gray-200 dark:border-transparent">
+                <button type="button" class="w-10 h-10 flex items-center justify-center text-gray-700 dark:text-white hover:bg-gray-200 dark:hover:bg-white/20 rounded-full transition-colors" title="Crop">
+                    <i class="fa-solid fa-crop-simple"></i>
+                </button>
+                <button type="button" class="w-10 h-10 flex items-center justify-center text-gray-700 dark:text-white hover:bg-gray-200 dark:hover:bg-white/20 rounded-full transition-colors" title="Rotate">
+                    <i class="fa-solid fa-rotate-right"></i>
+                </button>
+                <button type="button" class="w-10 h-10 flex items-center justify-center text-gray-700 dark:text-white hover:bg-gray-200 dark:hover:bg-white/20 rounded-full transition-colors" title="Draw">
+                    <i class="fa-solid fa-pencil"></i>
+                </button>
+                <button type="button" class="w-10 h-10 flex items-center justify-center text-gray-700 dark:text-white hover:bg-gray-200 dark:hover:bg-white/20 rounded-full transition-colors" title="Text">
+                    <i class="fa-solid fa-font"></i>
+                </button>
+                <div class="w-px h-6 bg-gray-300 dark:bg-white/30 mx-1"></div>
+                <button type="button" class="w-10 h-10 flex items-center justify-center text-gray-700 dark:text-white hover:bg-gray-200 dark:hover:bg-white/20 rounded-full transition-colors" title="Stickers">
+                    <i class="fa-regular fa-face-smile"></i>
+                </button>
+                <button type="button" class="w-10 h-10 flex items-center justify-center text-gray-700 dark:text-white hover:bg-gray-200 dark:hover:bg-white/20 rounded-full transition-colors" title="Add More">
+                    <i class="fa-solid fa-images"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Footer - Caption Input -->
+    <div class="bg-gray-100 dark:bg-[#202124] border-t border-gray-200 dark:border-gray-700/50 p-4 flex-shrink-0">
+        <form id="image-upload-form" 
+              action="{% url 'chat_upload_image' selected_user.id %}" 
+              method="POST" 
+              enctype="multipart/form-data"
+              hx-post="{% url 'chat_upload_image' selected_user.id %}"
+              hx-encoding="multipart/form-data"
+              hx-swap="none"
+              class="flex items-end gap-3">
+            {% csrf_token %}
+            <input type="file" id="image-input" name="image" accept="image/*" class="hidden">
+            
+            <div class="flex-1 bg-white dark:bg-[#2a2f32] border border-gray-200 dark:border-transparent rounded-xl flex items-center px-4 py-3 focus-within:ring-2 focus-within:ring-brand-purple/50 transition-all shadow-sm">
+                <button type="button" onclick="toggleCaptionEmojiPicker()" class="text-gray-400 dark:text-gray-400 hover:text-yellow-500 dark:hover:text-yellow-400 mr-3 transition-colors">
+                    <i class="fa-regular fa-face-smile text-xl"></i>
+                </button>
+                <input type="text" 
+                    id="image-caption" 
+                    name="caption" 
+                    placeholder="Add a caption..." 
+                    class="flex-1 bg-transparent border-none outline-none text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+                    maxlength="200">
+            </div>
+
+            <button type="submit" class="w-14 h-14 rounded-full bg-brand-purple hover:bg-brand-purple/90 text-white flex items-center justify-center shadow-lg shadow-brand-purple/30 transition-all hover:scale-105">
+                <i class="fa-solid fa-paper-plane text-lg"></i>
+            </button>
+        </form>
+    </div>
+</div>
+
 <div class="p-4 bg-white/90 dark:bg-black/40 dark:backdrop-blur-md border-t border-gray-300 dark:border-white/10 z-20 flex-shrink-0 animate-fade-in relative">
     
     <div id="emoji-picker" class="hidden absolute bottom-full left-4 mb-4 w-72 bg-white dark:bg-[#18181b] border border-gray-200 dark:border-gray-700 rounded-2xl shadow-2xl p-3 z-50 animate-fade-in">
@@ -75,6 +148,27 @@
         </div>
     </div>
 
+    <div id="attachment-picker" class="absolute bottom-full right-16 mb-4 w-64 bg-[#18181b] border border-gray-700 rounded-3xl shadow-2xl p-5 z-50 transition-all duration-200 origin-bottom-right scale-95 opacity-0 pointer-events-none">
+        <div class="grid grid-cols-3 gap-y-6 gap-x-2">
+            <div class="flex flex-col items-center gap-1.5 cursor-pointer group">
+                <div class="w-12 h-12 rounded-full bg-[#7f66ff] flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform"><i class="fa-solid fa-file-lines text-xl"></i></div>
+                <span class="text-[10px] text-gray-300 font-medium tracking-wide">Document</span>
+            </div>
+            <div class="flex flex-col items-center gap-1.5 cursor-pointer group" onclick="triggerImageInput()">
+                <div class="w-12 h-12 rounded-full bg-[#ff2e74] flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform"><i class="fa-solid fa-image text-xl"></i></div>
+                <span class="text-[10px] text-gray-300 font-medium tracking-wide">Gallery</span>
+            </div>
+            <div class="flex flex-col items-center gap-1.5 cursor-pointer group">
+                <div class="w-12 h-12 rounded-full bg-[#ff6b00] flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform"><i class="fa-solid fa-headphones text-xl"></i></div>
+                <span class="text-[10px] text-gray-300 font-medium tracking-wide">Audio</span>
+            </div>
+            <div class="flex flex-col items-center gap-1.5 cursor-pointer group">
+                <div class="w-12 h-12 rounded-full bg-[#00a884] flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform"><i class="fa-solid fa-video text-xl"></i></div>
+                <span class="text-[10px] text-gray-300 font-medium tracking-wide">Meeting</span>
+            </div>
+        </div>
+    </div>
+
     <form class="flex items-end gap-2" id="websocket-target"
         hx-ext="ws"
         ws-connect="/ws/chats/{{ selected_user.id }}"
@@ -82,9 +176,6 @@
         _="on htmx:wsAfterSend reset() me">
 
         {% csrf_token %}
-        <button type="button" class="w-10 h-10 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 text-gray-500 dark:text-gray-400 transition-colors flex items-center justify-center shrink-0 mb-0.5">
-            <i class="fa-solid fa-plus"></i>
-        </button>
         
         <div class="flex-1 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl flex items-end px-2 focus-within:border-brand-purple focus-within:ring-1 focus-within:ring-brand-purple transition-all shadow-inner">
             
@@ -96,7 +187,7 @@
                 {{ form.body }}
             </div>
 
-            <button type="button" class="text-gray-400 hover:text-brand-cyan w-10 h-10 mb-1 flex items-center justify-center shrink-0 transition-colors">
+            <button type="button" onclick="toggleAttachmentPicker()" class="text-gray-400 hover:text-brand-cyan w-10 h-10 flex items-center justify-center shrink-0 transition-colors">
                 <i class="fa-solid fa-paperclip text-[18px]"></i>
             </button>
         </div>
@@ -123,18 +214,16 @@
     const submitBtn = document.getElementById('submit-btn');
 
     if (textarea) {
-        // Auto-expand as user types
         textarea.addEventListener('input', function() {
-            this.style.height = 'auto'; // Reset height
-            this.style.height = (this.scrollHeight) + 'px'; // Set to scroll height
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
         });
 
-        // Handle Enter vs Shift+Enter
         textarea.addEventListener('keydown', function(e) {
             if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault(); // Prevent new line
+                e.preventDefault();
                 if (this.value.trim() !== '') {
-                    submitBtn.click(); // Trigger HTMX websocket send
+                    submitBtn.click();
                 }
             }
         });
@@ -154,19 +243,13 @@
             const end = textarea.selectionEnd;
             const text = textarea.value;
             
-            // Insert emoji at cursor
             textarea.value = text.substring(0, start) + emoji + text.substring(end);
-            
-            // Move cursor after emoji
             textarea.selectionStart = textarea.selectionEnd = start + emoji.length;
             textarea.focus();
-            
-            // Trigger input event to auto-resize textarea
             textarea.dispatchEvent(new Event('input'));
         }
     }
 
-    // Close emoji picker when clicking outside
     document.addEventListener('click', function(e) {
         if (!emojiPicker.classList.contains('hidden') && 
             !emojiPicker.contains(e.target) && 
@@ -175,14 +258,81 @@
         }
     });
 
-    // --- 4. HTMX Event Listeners ---
+    // --- 4. Attachment Picker ---
+    const attachmentPicker = document.getElementById('attachment-picker');
+    
+    function toggleAttachmentPicker() {
+        if (attachmentPicker.classList.contains('opacity-0')) {
+            attachmentPicker.classList.remove('opacity-0', 'scale-95', 'pointer-events-none');
+            attachmentPicker.classList.add('opacity-100', 'scale-100');
+        } else {
+            closeAttachmentPicker();
+        }
+    }
+
+    function closeAttachmentPicker() {
+        attachmentPicker.classList.remove('opacity-100', 'scale-100');
+        attachmentPicker.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+    }
+
+    // --- 5. Image Upload Modal ---
+    const imageModal = document.getElementById('image-upload-modal');
+    const imageInput = document.getElementById('image-input');
+    const previewImage = document.getElementById('preview-image');
+    const imageForm = document.getElementById('image-upload-form');
+
+    function triggerImageInput() {
+        imageInput.click();
+        closeAttachmentPicker();
+    }
+
+    imageInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file && file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                previewImage.src = event.target.result;
+                openImageModal();
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    function openImageModal() {
+        imageModal.classList.remove('hidden');
+        imageModal.classList.add('flex');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeImageModal() {
+        imageModal.classList.add('hidden');
+        imageModal.classList.remove('flex');
+        document.body.style.overflow = '';
+        imageInput.value = '';
+        document.getElementById('image-caption').value = '';
+    }
+
+    // HTMX event listener for successful upload
+    document.body.addEventListener('htmx:afterRequest', function(event) {
+        if (event.detail.elt.id === 'image-upload-form') {
+            if (event.detail.successful) {
+                closeImageModal();
+            }
+        }
+    });
+
+    // Caption emoji picker (optional)
+    function toggleCaptionEmojiPicker() {
+        // You can implement a separate emoji picker for caption if needed
+        console.log('Caption emoji picker');
+    }
+
+    // --- 6. HTMX Event Listeners ---
     document.body.addEventListener("htmx:wsAfterSend", function() {
-        // Reset textarea height after sending message
         if (textarea) {
             textarea.style.height = 'auto';
         }
         scrollChatToBottom();
-        // Hide emoji picker if open
         emojiPicker.classList.add('hidden');
     });
     

@@ -1,6 +1,7 @@
 from django.db import models
 from apps.users.models import User
 from apps.master.models import BaseClass
+import os
 
 # Create your models here.
 class Conversation(BaseClass):
@@ -20,24 +21,22 @@ class Conversation(BaseClass):
     def last_message(self):
         return self.messages.order_by('-created_at').first()
     
-    @property
-    def get_unread_count_user1(self):
-        # Count messages in this conversation where the user is NOT the sender, and is_read is False
-        return self.messages.filter(is_read=False).exclude(sender=self.user1).count()
-    
-    @property
-    def get_unread_count_user2(self):
-        # Count messages in this conversation where the user is NOT the sender, and is_read is False
-        return self.messages.filter(is_read=False).exclude(sender=self.user2).count()
-    
     def get_unread_count_user(self,user):
-        # Count messages in this conversation where the user is NOT the sender, and is_read is False
         return self.messages.filter(is_read=False).exclude(sender=user).count()
     
+def chat_upload_image_handler(instance,filename):
+    ext = os.path.splitext(filename)[-1]
+    return os.path.join("conversations",instance.conversation.id,f"{instance.id}{ext}")
+    
 class Message(BaseClass):
+    class MessageType(models.TextChoices):
+        TEXT = "text"
+        IMG = "image"
     conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE, related_name="messages")
+    type = models.CharField(max_length=100,choices= MessageType.choices, default=MessageType.TEXT)
     sender = models.ForeignKey(User, on_delete=models.CASCADE)
-    body = models.TextField()
+    body = models.TextField() # If type is IMG then body will become captions
+    image = models.ImageField(null=True,blank=True,upload_to=chat_upload_image_handler)
     is_read = models.BooleanField(default=False)
 
     def __str__(self):

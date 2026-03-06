@@ -6,6 +6,9 @@ from django.utils import timezone
 from apps.master.middlewares.auth.utils import login_required_jwt
 from .models import User, Conversation, Message, get_or_create_conversation
 from .forms import SendMessageForm
+from django.http import JsonResponse, HttpResponse
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 
 # Create your views here.
 def demo(request):
@@ -57,15 +60,39 @@ def chatsIndex(request,user_id=None):
     }
     return render(request, "chats/chat.html", context)
 
+
+
+def chat_upload_image(request, user_id):
+    if request.method == "POST":
+        image = request.FILES.get('image')
+        caption = request.POST.get('caption', '')
+        # print(image,caption)
+        # return HttpResponse("")
+        
+        if image:
+            other_user = get_object_or_404(User, id=user_id)
+            conversation = get_or_create_conversation(request.authenticated_user , other_user)
+            
+            # 1. Create the message in DB
+            msg = Message.objects.create(
+                conversation=conversation,
+                sender=request.authenticated_user,
+                type=Message.MessageType.IMG,
+                image=image,
+                body=caption
+            )
+            
+            # 2. Broadcast to the open chat room via WebSocket
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                str(conversation.id),
+                {'type': 'message_handler', 'message_id': msg.id}
+            )
+            
+            # 3. Broadcast to sidebars for unread count/previews
+            async_to_sync(channel_layer.group_send)(
+                "global_man",{'type': 'last_message_handler', 'conversation_id': conversation.id}
+            )
+            
+    return HttpResponse("") # HTMX expects an empty response for hx-swap="none"
     
-
-
-    # if 'hx-request' in request.headers:
-    #     context = {
-    #         'target_user_id': user_id,
-    #         # Mock data for UI demo
-    #         'user_name': user_id.replace('_', ' ').title(), 
-    #         'status': 'online',
-    #     }       
-    #     return render(request, 'chats/partials/conversation.html', context)
-    return render(request,"chats/chat.html")

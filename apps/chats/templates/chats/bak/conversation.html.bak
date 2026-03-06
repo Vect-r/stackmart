@@ -1,0 +1,231 @@
+<div class="h-16 border-b border-gray-300 dark:border-white/10 flex items-center justify-between px-4 bg-white/90 dark:bg-black/40 backdrop-blur-md z-10 flex-shrink-0 animate-fade-in">
+    <div class="flex items-center gap-3">
+        <button onclick="closeChat('user_{{selected_user.id}}')" class="md:hidden w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-900 dark:hover:text-white">
+            <i class="fa-solid fa-arrow-left"></i>
+        </button>
+        
+        <img src="https://ui-avatars.com/api/?name={{selected_user.username}}&background=7928ca&color=fff" class="w-10 h-10 rounded-full border border-gray-200 dark:border-gray-700">
+        <div>
+            <h3 class="font-bold text-gray-900 dark:text-white text-sm">{{ selected_user.username}}</h3>
+            {% comment %} <div class="flex items-center gap-1.5">
+                <span id="status_indicator_{{selected_user.id}}" class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                <span class="text-xs text-green-500 font-mono">online</span>
+            </div> {% endcomment %}
+            {% include "chats/partials/user-status.html" with user=selected_user%}
+        </div>
+    </div>
+
+    <div class="flex items-center gap-4 text-gray-400">
+        <button class="hover:text-brand-purple transition-colors"><i class="fa-solid fa-phone"></i></button>
+        <button class="hover:text-brand-cyan transition-colors"><i class="fa-solid fa-video"></i></button>
+        <div class="w-px h-5 bg-gray-300 dark:bg-gray-700"></div>
+        <button class="hover:text-gray-600 dark:hover:text-white transition-colors"><i class="fa-solid fa-magnifying-glass"></i></button>
+        <button class="hover:text-gray-600 dark:hover:text-white transition-colors"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+    </div>
+</div>
+
+<!--Messages-->
+{% load humanize %} <div class="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-6 relative bg-[#f9fafb]/50 dark:bg-transparent animate-fade-in" id="chat-messages">
+    
+    <div class="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none" 
+            style="background-image: radial-gradient(#7928ca 1px, transparent 1px); background-size: 20px 20px;">
+    </div>
+
+    {% regroup messages by local_date as date_groups %}
+
+    {% for group in date_groups %}
+        
+        <div class="flex justify-center relative z-10 my-4">
+            <span class="bg-gray-200 dark:bg-black/50 text-gray-600 dark:text-gray-400 text-[10px] font-mono px-3 py-1 rounded-full border border-gray-300 dark:border-white/10 shadow-sm backdrop-blur-sm">
+                {{ group.grouper|naturalday|title }}
+            </span>
+        </div>
+
+        {% for msg in group.list %}
+            {% include 'chats/chat-pills.html' %}
+        {% endfor %}
+        
+    {% endfor %}
+
+</div>
+
+<div class="p-4 bg-white/90 dark:bg-black/40 dark:backdrop-blur-md border-t border-gray-300 dark:border-white/10 z-20 flex-shrink-0 animate-fade-in relative">
+    
+    <div id="emoji-picker" class="hidden absolute bottom-full left-4 mb-4 w-72 bg-white dark:bg-[#18181b] border border-gray-200 dark:border-gray-700 rounded-2xl shadow-2xl p-3 z-50 animate-fade-in">
+        <div class="text-xs font-bold text-gray-400 mb-2 font-mono uppercase tracking-wider">Emojis</div>
+        <div class="grid grid-cols-6 gap-1 max-h-48 overflow-y-auto custom-scrollbar pr-1 text-2xl">
+            <span class="cursor-pointer hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg text-center p-1 transition-colors" onclick="insertEmoji('😀')">😀</span>
+            <span class="cursor-pointer hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg text-center p-1 transition-colors" onclick="insertEmoji('😂')">😂</span>
+            <span class="cursor-pointer hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg text-center p-1 transition-colors" onclick="insertEmoji('🤣')">🤣</span>
+            <span class="cursor-pointer hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg text-center p-1 transition-colors" onclick="insertEmoji('😊')">😊</span>
+            <span class="cursor-pointer hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg text-center p-1 transition-colors" onclick="insertEmoji('😍')">😍</span>
+            <span class="cursor-pointer hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg text-center p-1 transition-colors" onclick="insertEmoji('🙏')">🙏</span>
+            <span class="cursor-pointer hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg text-center p-1 transition-colors" onclick="insertEmoji('😎')">😎</span>
+            <span class="cursor-pointer hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg text-center p-1 transition-colors" onclick="insertEmoji('🔥')">🔥</span>
+            <span class="cursor-pointer hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg text-center p-1 transition-colors" onclick="insertEmoji('👍')">👍</span>
+            <span class="cursor-pointer hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg text-center p-1 transition-colors" onclick="insertEmoji('❤️')">❤️</span>
+            <span class="cursor-pointer hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg text-center p-1 transition-colors" onclick="insertEmoji('✨')">✨</span>
+            <span class="cursor-pointer hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg text-center p-1 transition-colors" onclick="insertEmoji('🚀')">🚀</span>
+            <span class="cursor-pointer hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg text-center p-1 transition-colors" onclick="insertEmoji('💻')">💻</span>
+            <span class="cursor-pointer hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg text-center p-1 transition-colors" onclick="insertEmoji('🎉')">🎉</span>
+            <span class="cursor-pointer hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg text-center p-1 transition-colors" onclick="insertEmoji('💯')">💯</span>
+            <span class="cursor-pointer hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg text-center p-1 transition-colors" onclick="insertEmoji('👀')">👀</span>
+            <span class="cursor-pointer hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg text-center p-1 transition-colors" onclick="insertEmoji('🤔')">🤔</span>
+            <span class="cursor-pointer hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg text-center p-1 transition-colors" onclick="insertEmoji('✅')">✅</span>
+        </div>
+    </div>
+
+    <div id="attachment-picker" class="absolute bottom-full right-16 mb-4 w-64 bg-[#18181b] border border-gray-700 rounded-3xl shadow-2xl p-5 z-50 transition-all duration-200 origin-bottom-right scale-95 opacity-0 pointer-events-none">
+        <div class="grid grid-cols-3 gap-y-6 gap-x-2">
+            <div class="flex flex-col items-center gap-1.5 cursor-pointer group">
+                <div class="w-12 h-12 rounded-full bg-[#7f66ff] flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform"><i class="fa-solid fa-file-lines text-xl"></i></div>
+                <span class="text-[10px] text-gray-300 font-medium tracking-wide">Document</span>
+            </div>
+            <div class="flex flex-col items-center gap-1.5 cursor-pointer group" onclick="openImageModal()">
+                <div class="w-12 h-12 rounded-full bg-[#ff2e74] flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform"><i class="fa-solid fa-image text-xl"></i></div>
+                <span class="text-[10px] text-gray-300 font-medium tracking-wide">Gallery</span>
+            </div>
+            <div class="flex flex-col items-center gap-1.5 cursor-pointer group">
+                <div class="w-12 h-12 rounded-full bg-[#ff6b00] flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform"><i class="fa-solid fa-headphones text-xl"></i></div>
+                <span class="text-[10px] text-gray-300 font-medium tracking-wide">Audio</span>
+            </div>
+            <div class="flex flex-col items-center gap-1.5 cursor-pointer group">
+                <div class="w-12 h-12 rounded-full bg-[#00a884] flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform"><i class="fa-solid fa-video text-xl"></i></div>
+                <span class="text-[10px] text-gray-300 font-medium tracking-wide">Meeting</span>
+            </div>
+        </div>
+    </div>
+
+    <form class="flex items-end gap-2" id="websocket-target"
+        hx-ext="ws"
+        ws-connect="/ws/chats/{{ selected_user.id }}"
+        ws-send
+        _="on htmx:wsAfterSend reset() me">
+
+        {% csrf_token %}
+        {% comment %} <button type="button" class="w-10 h-10 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 text-gray-500 dark:text-gray-400 transition-colors flex items-center justify-center shrink-0 mb-0.5">
+            <i class="fa-solid fa-plus"></i>
+        </button> {% endcomment %}
+        
+        <div class="flex-1 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl flex items-end px-2 focus-within:border-brand-purple focus-within:ring-1 focus-within:ring-brand-purple transition-all shadow-inner">
+            
+            <button type="button" id="emoji-btn" onclick="toggleEmojiPicker()" class="text-gray-400 hover:text-yellow-500 w-10 h-10 mb-1 flex items-center justify-center shrink-0 transition-colors">
+                <i class="fa-regular fa-face-smile text-[18px]"></i>
+            </button>
+            
+            <div class="w-full flex-1 py-2.5" id="msg-input-container">
+                {{ form.body }}
+            </div>
+
+            <button type="button" onclick="toggleAttachmentPicker()" class="text-gray-400 hover:text-brand-cyan w-10 h-10 flex items-center justify-center shrink-0 transition-colors">
+                <i class="fa-solid fa-paperclip text-[18px]"></i>
+            </button>
+        </div>
+
+        <button type="submit" id="submit-btn" class="w-10 h-10 rounded-full bg-brand-purple hover:bg-brand-purple/90 text-white flex items-center justify-center shadow-lg shadow-brand-purple/20 transition-all shrink-0 mb-0.5">
+            <i class="fa-solid fa-paper-plane text-sm"></i>
+        </button>
+    </form>
+</div>
+
+{% block javascript %}
+<script>
+    // --- 1. Auto-Scroll Logic ---
+    function scrollChatToBottom() {
+        const container = document.getElementById("chat-messages");
+        if (container) {
+            container.scrollTop = container.scrollHeight;
+        }
+    }
+
+    // --- 2. Textarea Auto-Expand & Shift+Enter Logic ---
+    const msgContainer = document.getElementById('msg-input-container');
+    const textarea = msgContainer ? msgContainer.querySelector('textarea') : null;
+    const submitBtn = document.getElementById('submit-btn');
+
+    if (textarea) {
+        // Auto-expand as user types
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto'; // Reset height
+            this.style.height = (this.scrollHeight) + 'px'; // Set to scroll height
+        });
+
+        // Handle Enter vs Shift+Enter
+        textarea.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault(); // Prevent new line
+                if (this.value.trim() !== '') {
+                    submitBtn.click(); // Trigger HTMX websocket send
+                }
+            }
+        });
+    }
+
+    // --- 3. Emoji Picker Logic ---
+    const emojiPicker = document.getElementById('emoji-picker');
+    const emojiBtn = document.getElementById('emoji-btn');
+
+    function toggleEmojiPicker() {
+        emojiPicker.classList.toggle('hidden');
+    }
+
+    function insertEmoji(emoji) {
+        if (textarea) {
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const text = textarea.value;
+            
+            // Insert emoji at cursor
+            textarea.value = text.substring(0, start) + emoji + text.substring(end);
+            
+            // Move cursor after emoji
+            textarea.selectionStart = textarea.selectionEnd = start + emoji.length;
+            textarea.focus();
+            
+            // Trigger input event to auto-resize textarea
+            textarea.dispatchEvent(new Event('input'));
+        }
+    }
+
+    // Close emoji picker when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!emojiPicker.classList.contains('hidden') && 
+            !emojiPicker.contains(e.target) && 
+            !emojiBtn.contains(e.target)) {
+            emojiPicker.classList.add('hidden');
+        }
+    });
+
+    // --- 4. HTMX Event Listeners ---
+    document.body.addEventListener("htmx:wsAfterSend", function() {
+        // Reset textarea height after sending message
+        if (textarea) {
+            textarea.style.height = 'auto';
+        }
+        scrollChatToBottom();
+        // Hide emoji picker if open
+        emojiPicker.classList.add('hidden');
+    });
+    
+    document.body.addEventListener("htmx:wsAfterMessage", scrollChatToBottom);
+
+    // Initial scroll
+    scrollChatToBottom();
+
+    const attachmentPicker = document.getElementById('attachment-picker');
+    
+    function toggleAttachmentPicker() {
+        if (attachmentPicker.classList.contains('opacity-0')) {
+            attachmentPicker.classList.remove('opacity-0', 'scale-95', 'pointer-events-none');
+            attachmentPicker.classList.add('opacity-100', 'scale-100');
+        } else {
+            closeAttachmentPicker();
+        }
+    }
+
+    function closeAttachmentPicker() {
+        attachmentPicker.classList.remove('opacity-100', 'scale-100');
+        attachmentPicker.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+    }
+</script>
+{% endblock javascript %}

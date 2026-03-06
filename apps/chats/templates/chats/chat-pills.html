@@ -1,21 +1,87 @@
 {%if msg.sender != current_user%}
+<!-- Received Message -->
 <div class="flex items-end gap-2 max-w-[85%] md:max-w-[70%] relative z-10 animate-fade-in">
     <img src="https://ui-avatars.com/api/?name={{ msg.sender.username }}&background=7928ca&color=fff" class="w-6 h-6 rounded-full mb-1 border border-white dark:border-transparent shadow-sm">
-    <div class="bg-white dark:bg-black/60 dark:backdrop-blur-md border border-gray-200 dark:border-white/10 p-3 rounded-2xl rounded-bl-none shadow-sm">
-        <p class="text-sm text-gray-800 dark:text-gray-200">{{msg.body}}</p>
-        <span class="text-[10px] text-gray-400 block text-right mt-1 font-mono">{{msg.created_at|date:"h:i a"}}</span>
-    </div>
-</div>
-{%else%}
-<div class="flex flex-col items-end gap-1 max-w-[85%] md:max-w-[70%] ml-auto relative z-10 animate-fade-in">
-    <div class="bg-gradient-to-br from-brand-purple to-brand-cyan p-3 rounded-2xl rounded-br-none shadow-md shadow-brand-purple/20 text-white">
-        <p class="text-sm font-medium">{{msg.body}}</p>
-        <div class="flex items-center justify-end gap-1 mt-1">
-            <span class="text-[10px] text-white/70 font-mono">{{msg.created_at|date:"h:i a"}}</span>
-            {% comment %} <i class="fa-solid fa-check-double text-[10px] text-white/90"></i> {% endcomment %}
-            {% comment %} <i class="fa-solid fa-check{% if msg.is_read %}-double text-blue-500{% else %} text-gray-700{% endif %} text-[10px] mr-1"></i> {% endcomment %}
-            {% include 'chats/partials/read-receipt.html' with msg=msg%}
+    
+    {% if msg.type == 'image' %}
+        <!-- Image Message -->
+        <div class="bg-white dark:bg-black/60 dark:backdrop-blur-md border border-gray-200 dark:border-white/10 rounded-2xl rounded-bl-none shadow-sm overflow-hidden max-w-sm">
+            <img src="{{ msg.image.url }}" alt="Shared image" class="w-full h-auto object-cover cursor-pointer hover:opacity-90 transition-opacity" onclick="openImageViewer('{{ msg.image.url }}')">
+            {% if msg.body %}
+                <div class="p-3">
+                    <p class="text-sm text-gray-800 dark:text-gray-200">{{ msg.body }}</p>
+                    <span class="text-[10px] text-gray-400 block text-right mt-1 font-mono">{{msg.created_at|date:"h:i a"}}</span>
+                </div>
+            {% else %}
+                <div class="px-3 pb-2 pt-1">
+                    <span class="text-[10px] text-gray-400 block text-right font-mono">{{msg.created_at|date:"h:i a"}}</span>
+                </div>
+            {% endif %}
         </div>
-    </div>
+    {% else %}
+        <!-- Text Message -->
+        <div class="bg-white dark:bg-black/60 dark:backdrop-blur-md border border-gray-200 dark:border-white/10 p-3 rounded-2xl rounded-bl-none shadow-sm">
+            <p class="text-sm text-gray-800 dark:text-gray-200">{{msg.body}}</p>
+            <span class="text-[10px] text-gray-400 block text-right mt-1 font-mono">{{msg.created_at|date:"h:i a"}}</span>
+        </div>
+    {% endif %}
 </div>
+
+{%else%}
+<!-- Sent Message -->
+<div class="flex flex-col items-end gap-1 max-w-[85%] md:max-w-[70%] ml-auto relative z-10 animate-fade-in">
+    {% if msg.type == 'image' %}
+        <!-- Image Message -->
+        <div class="bg-gradient-to-br from-brand-purple to-brand-cyan rounded-2xl rounded-br-none shadow-md shadow-brand-purple/20 overflow-hidden max-w-sm">
+            <img src="{{ msg.image.url }}" alt="Shared image" class="w-full h-auto object-cover cursor-pointer hover:opacity-90 transition-opacity" onclick="openImageViewer('{{ msg.image.url }}')">
+            {% if msg.body %}
+                <div class="p-3 text-white">
+                    <p class="text-sm font-medium">{{ msg.body }}</p>
+                    <div class="flex items-center justify-end gap-1 mt-1">
+                        <span class="text-[10px] text-white/70 font-mono">{{msg.created_at|date:"h:i a"}}</span>
+                        {% include 'chats/partials/read-receipt.html' with msg=msg%}
+                    </div>
+                </div>
+            {% else %}
+                <div class="px-3 pb-2 pt-1 flex items-center justify-end gap-1">
+                    <span class="text-[10px] text-white/70 font-mono">{{msg.created_at|date:"h:i a"}}</span>
+                    {% include 'chats/partials/read-receipt.html' with msg=msg%}
+                </div>
+            {% endif %}
+        </div>
+    {% else %}
+        <!-- Text Message -->
+        <div class="bg-gradient-to-br from-brand-purple to-brand-cyan p-3 rounded-2xl rounded-br-none shadow-md shadow-brand-purple/20 text-white">
+            <p class="text-sm font-medium">{{msg.body}}</p>
+            <div class="flex items-center justify-end gap-1 mt-1">
+                <span class="text-[10px] text-white/70 font-mono">{{msg.created_at|date:"h:i a"}}</span>
+                {% include 'chats/partials/read-receipt.html' with msg=msg%}
+            </div>
+        </div>
+    {% endif %}
+</div>
+{%endif%}
+
+{% if msg.type == 'image'%}
+<script>
+function openImageViewer(imageUrl) {
+    // Create fullscreen image viewer
+    const viewer = document.createElement('div');
+    viewer.className = 'fixed inset-0 bg-black/95 z-[200] flex items-center justify-center p-4';
+    viewer.innerHTML = `
+        <button onclick="this.parentElement.remove()" class="absolute top-4 right-4 w-10 h-10 flex items-center justify-center text-white hover:bg-white/10 rounded-full transition-colors">
+            <i class="fa-solid fa-xmark text-2xl"></i>
+        </button>
+        <img src="${imageUrl}" class="max-w-full max-h-full object-contain rounded-lg shadow-2xl">
+    `;
+    document.body.appendChild(viewer);
+    
+    // Close on click outside
+    viewer.addEventListener('click', function(e) {
+        if (e.target === viewer) {
+            viewer.remove();
+        }
+    });
+}
+</script>
 {%endif%}
